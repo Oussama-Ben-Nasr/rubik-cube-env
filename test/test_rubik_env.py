@@ -180,7 +180,7 @@ def test_action_11_efffect(cube_instance) -> None:
     assert np.array_equal(cube_instance._state, expected_action_11_effect)
 
 
-def test_should_raise_on_forbidden_action(cube_instance) -> Exception:
+def test_should_raise_on_forbidden_action(cube_instance) -> None:
     with pytest.raises(ValueError, match=r".*from 0 to 11 inclusive"):
         cube_instance.apply_action(12)
     with pytest.raises(ValueError, match=r".*from 0 to 11 inclusive"):
