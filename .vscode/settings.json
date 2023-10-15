@@ -3,5 +3,9 @@
         "."
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "editor.defaultFormatter": "ms-python.vscode-pylance",
+    "editor.codeActionsOnSave": {
+        "source.sortImports": true,
+    },
 }
