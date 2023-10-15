@@ -1,9 +1,17 @@
+"""
+Module Name: range_min.py
+
+Description: This module provides test bank for rubik_cube environmebt.
+
+Author: Oussama Ben Nasr
+Date: October 15, 2023
+"""
 import pytest
 import numpy as np
 from cube_env.rubik_env import RubikCube
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def cube_instance() -> RubikCube:
     cube = RubikCube()
     cube.reset()
@@ -18,10 +26,10 @@ def test_initial_state_cube(cube_instance) -> None:
             [0, 0, 0, 1, 1, 1, 2, 2, 2],
             [3, 3, 3, 4, 4, 4, 5, 5, 5],
             [3, 3, 3, 4, 4, 4, 5, 5, 5],
-            [3, 3, 3, 4, 4, 4, 5, 5, 5]
+            [3, 3, 3, 4, 4, 4, 5, 5, 5],
         ]
     )
-    assert np.array_equal(cube_instance._state, expected_initial_state)
+    assert np.array_equal(cube_instance.get_state(), expected_initial_state)
 
 
 def test_action_0_efffect(cube_instance) -> None:
@@ -31,10 +39,10 @@ def test_action_0_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [3, 3, 3, 0, 0, 0, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(0)
-    assert np.array_equal(cube_instance._state, expected_action_0_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_0_effect)
 
 
 def test_action_1_efffect(cube_instance) -> None:
@@ -44,10 +52,10 @@ def test_action_1_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [3, 3, 3, 1, 1, 1, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(1)
-    assert np.array_equal(cube_instance._state, expected_action_1_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_1_effect)
 
 
 def test_action_2_efffect(cube_instance) -> None:
@@ -57,10 +65,10 @@ def test_action_2_efffect(cube_instance) -> None:
         [2, 2, 2, 4, 4, 4, 1, 1, 1],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 0, 0, 0, 5, 5, 5]
+        [3, 3, 3, 0, 0, 0, 5, 5, 5],
     ]
     cube_instance.apply_action(2)
-    assert np.array_equal(cube_instance._state, expected_action_2_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_2_effect)
 
 
 def test_action_3_efffect(cube_instance) -> None:
@@ -70,10 +78,10 @@ def test_action_3_efffect(cube_instance) -> None:
         [4, 4, 4, 2, 2, 2, 0, 0, 0],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 1, 1, 1, 5, 5, 5]
+        [3, 3, 3, 1, 1, 1, 5, 5, 5],
     ]
     cube_instance.apply_action(3)
-    assert np.array_equal(cube_instance._state, expected_action_3_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_3_effect)
 
 
 def test_action_4_efffect(cube_instance) -> None:
@@ -83,10 +91,10 @@ def test_action_4_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [4, 4, 4, 5, 5, 5, 2, 2, 2],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(4)
-    assert np.array_equal(cube_instance._state, expected_action_4_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_4_effect)
 
 
 def test_action_5_efffect(cube_instance) -> None:
@@ -96,10 +104,10 @@ def test_action_5_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [2, 2, 2, 3, 3, 3, 4, 4, 4],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(5)
-    assert np.array_equal(cube_instance._state, expected_action_5_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_5_effect)
 
 
 def test_action_6_efffect(cube_instance) -> None:
@@ -109,10 +117,10 @@ def test_action_6_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [2, 2, 2, 3, 3, 3, 4, 4, 4]
+        [2, 2, 2, 3, 3, 3, 4, 4, 4],
     ]
     cube_instance.apply_action(6)
-    assert np.array_equal(cube_instance._state, expected_action_6_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_6_effect)
 
 
 def test_action_7_efffect(cube_instance) -> None:
@@ -122,10 +130,10 @@ def test_action_7_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 3, 3, 3],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [4, 4, 4, 5, 5, 5, 2, 2, 2]
+        [4, 4, 4, 5, 5, 5, 2, 2, 2],
     ]
     cube_instance.apply_action(7)
-    assert np.array_equal(cube_instance._state, expected_action_7_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_7_effect)
 
 
 def test_action_8_efffect(cube_instance) -> None:
@@ -135,10 +143,10 @@ def test_action_8_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [0, 0, 0, 4, 4, 4, 1, 1, 1],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(8)
-    assert np.array_equal(cube_instance._state, expected_action_8_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_8_effect)
 
 
 def test_action_9_efffect(cube_instance) -> None:
@@ -148,10 +156,10 @@ def test_action_9_efffect(cube_instance) -> None:
         [0, 0, 0, 1, 1, 1, 2, 2, 2],
         [1, 1, 1, 4, 4, 4, 0, 0, 0],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [3, 3, 3, 4, 4, 4, 5, 5, 5]
+        [3, 3, 3, 4, 4, 4, 5, 5, 5],
     ]
     cube_instance.apply_action(9)
-    assert np.array_equal(cube_instance._state, expected_action_9_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_9_effect)
 
 
 def test_action_10_efffect(cube_instance) -> None:
@@ -161,10 +169,10 @@ def test_action_10_efffect(cube_instance) -> None:
         [3, 3, 3, 5, 5, 5, 2, 2, 2],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [1, 1, 1, 4, 4, 4, 0, 0, 0]
+        [1, 1, 1, 4, 4, 4, 0, 0, 0],
     ]
     cube_instance.apply_action(10)
-    assert np.array_equal(cube_instance._state, expected_action_10_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_10_effect)
 
 
 def test_action_11_efffect(cube_instance) -> None:
@@ -174,10 +182,10 @@ def test_action_11_efffect(cube_instance) -> None:
         [5, 5, 5, 3, 3, 3, 2, 2, 2],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
         [3, 3, 3, 4, 4, 4, 5, 5, 5],
-        [0, 0, 0, 4, 4, 4, 1, 1, 1]
+        [0, 0, 0, 4, 4, 4, 1, 1, 1],
     ]
     cube_instance.apply_action(11)
-    assert np.array_equal(cube_instance._state, expected_action_11_effect)
+    assert np.array_equal(cube_instance.get_state(), expected_action_11_effect)
 
 
 def test_should_raise_on_forbidden_action(cube_instance) -> None:
