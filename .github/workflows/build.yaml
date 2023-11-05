@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.8, 3.9, 3.12]
     runs-on: ubuntu-latest
 
     steps:
@@ -28,5 +28,5 @@ jobs:
           - name: Compile for type safety
             run: mypy .
           - name: Run unit tests
-            run: pytest
+            run: python -m pytest
 
