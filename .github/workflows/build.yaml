@@ -28,5 +28,9 @@ jobs:
           - name: Compile for type safety
             run: mypy .
           - name: Run unit tests
+<<<<<<< Updated upstream
             run: pytest
+=======
+            run: python -m pytest -rP
+>>>>>>> Stashed changes
 

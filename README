@@ -6,3 +6,5 @@
 2. Green
 3. Refactor
 4. Repeate
+
+* python3.8 -m pytest -rP to capture prints within tests
