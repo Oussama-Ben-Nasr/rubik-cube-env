@@ -28,5 +28,5 @@ jobs:
           - name: Compile for type safety
             run: mypy .
           - name: Run unit tests
-            run: python -m pytest
+            run: python -m pytest -rP
 

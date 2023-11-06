@@ -1,0 +1,106 @@
+<!--
+[1] https://www.codepel.com/vanilla-javascript/3d-rotating-cube-javascript/
+auther Jordan Leigh
+[2] https://dev.to/martinp/how-to-do-stunning-3d-with-pure-htmlcss-ah 
+auther Martin PAUCOT
+-->
+<html>
+
+<head>
+  <title>Render cube</title>
+  <link rel="stylesheet" href="./cube.css">
+  <link rel="icon" type="image/x-icon" href="./cube.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+</head>
+
+<body>
+
+  <div id="wrapper">
+    <div class="viewport">
+      <div class="cube">
+        <div class="side">
+          <div id="cell4" style="border:solid" class="one center">1</div>
+          <div id="cell1" style="border:solid" class="one top"></div>
+          <div id="cell7" style="border:solid" class="one bottom"></div>
+          <div id="cell5" style="border:solid" class="one right"></div>
+          <div id="cell3" style="border:solid" class="one left"></div>
+          <div id="cell2" style="border:solid" class="one top right"></div>
+          <div id="cell0" style="border:solid" class="one top left"></div>
+          <div id="cell8" style="border:solid" class="one bottom right"></div>
+          <div id="cell6" style="border:solid" class="one bottom left"></div>
+        </div>
+        <div class="side">
+          <div id="cell31" style="border:solid" class="two center">2</div>
+          <div id="cell28" style="border:solid" class="two top"></div>
+          <div id="cell34" style="border:solid" class="two bottom"></div>
+          <div id="cell32" style="border:solid" class="two right"></div>
+          <div id="cell30" style="border:solid" class="two left"></div>
+          <div id="cell29" style="border:solid" class="two top right"></div>
+          <div id="cell27" style="border:solid" class="two top left"></div>
+          <div id="cell35" style="border:solid" class="two bottom right"></div>
+          <div id="cell33" style="border:solid" class="two bottom left"></div>
+        </div>
+        <div class="side">
+          <div id="cell22" style="border:solid" class="three center">3</div>
+          <div id="cell19" style="border:solid" class="three top"></div>
+          <div id="cell25" style="border:solid" class="three bottom"></div>
+          <div id="cell23" style="border:solid" class="three right"></div>
+          <div id="cell21" style="border:solid" class="three left"></div>
+          <div id="cell20" style="border:solid" class="three top right"></div>
+          <div id="cell18" style="border:solid" class="three top left"></div>
+          <div id="cell26" style="border:solid" class="three bottom right"></div>
+          <div id="cell24" style="border:solid" class="three bottom left"></div>
+        </div>
+        <div class="side">
+          <div id="cell40" style="border:solid" class="four center">4</div>
+          <div id="cell37" style="border:solid" class="four top"></div>
+          <div id="cell43" style="border:solid" class="four bottom"></div>
+          <div id="cell41" style="border:solid" class="four right"></div>
+          <div id="cell39" style="border:solid" class="four left"></div>
+          <div id="cell38" style="border:solid" class="four top right"></div>
+          <div id="cell36" style="border:solid" class="four top left"></div>
+          <div id="cell44" style="border:solid" class="four bottom right"></div>
+          <div id="cell42" style="border:solid" class="four bottom left"></div>
+        </div>
+        <div class="side">
+          <div id="cell49" style="border:solid" class="five center">5</div>
+          <div id="cell46" style="border:solid" class="five top"></div>
+          <div id="cell52" style="border:solid" class="five bottom"></div>
+          <div id="cell50" style="border:solid" class="five right"></div>
+          <div id="cell48" style="border:solid" class="five left"></div>
+          <div id="cell47" style="border:solid" class="five top right"></div>
+          <div id="cell45" style="border:solid" class="five top left"></div>
+          <div id="cell53" style="border:solid" class="five bottom right"></div>
+          <div id="cell51" style="border:solid" class="five bottom left"></div>
+        </div>
+        <div class="side">
+          <div id="cell13" style="border:solid" class="six center">6</div>
+          <div id="cell10" style="border:solid" class="six top"></div>
+          <div id="cell16" style="border:solid" class="six bottom"></div>
+          <div id="cell14" style="border:solid" class="six right"></div>
+          <div id="cell12" style="border:solid" class="six left"></div>
+          <div id="cell11" style="border:solid" class="six top right"></div>
+          <div id="cell9"  style="border:solid" class="six top left"></div>
+          <div id="cell17" style="border:solid" class="six bottom right"></div>
+          <div id="cell15" style="border:solid" class="six bottom left"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="./cube.js"></script>
+  <script type="text/javascript" src="./color_cube.js"></script>
+</body>
+
+</html>
+<!--
+  In the solved state we have the following mapping
+state     :  0 3 1 5 4 2
+cube face :  1 2 6 4 5 3
+color     :  r w o y g b
+             e i r e r l
+             d t a l e u
+               e n l e e
+                 g o n
+                 e w
+-->

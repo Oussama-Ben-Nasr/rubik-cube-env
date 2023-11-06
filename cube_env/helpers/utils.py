@@ -7,6 +7,7 @@ Author: Oussama Ben Nasr
 Date: October 15, 2023
 """
 import numpy as np
+from time import perf_counter
 
 
 def swap_blocks(array: np.ndarray, x1: int, y1: int, x2: int, y2: int) -> None:
@@ -27,3 +28,11 @@ def swap_blocks(array: np.ndarray, x1: int, y1: int, x2: int, y2: int) -> None:
     nd_value = array[x2, y2]
     array.flat[[range(9 * x1 + y1, 9 * x1 + y1 + 3)]] = nd_value
     array.flat[[range(9 * x2 + y2, 9 * x2 + y2 + 3)]] = st_value
+
+def timeit(fn):
+    def timed_fn(*args, **kwargs):
+        start = perf_counter()
+        fn(*args, **kwargs)
+        end = perf_counter()
+        print(f"It took {end - start} ns")
+    return timed_fn

@@ -8,7 +8,6 @@ Date: October 15, 2023
 """
 from cube_env.helpers.stack import Stack
 
-
 def test_new_stack_is_empty():
     st = Stack()
     assert st.is_empty

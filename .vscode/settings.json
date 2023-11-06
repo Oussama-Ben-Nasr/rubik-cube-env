@@ -8,4 +8,11 @@
     "editor.codeActionsOnSave": {
         "source.sortImports": true,
     },
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "test_*.py"
+    ],
 }
