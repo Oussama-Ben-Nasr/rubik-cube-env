@@ -193,3 +193,8 @@ def test_should_raise_on_forbidden_action(cube_instance) -> None:
         cube_instance.apply_action(12)
     with pytest.raises(ValueError, match=r".*from 0 to 11 inclusive"):
         cube_instance.apply_action(-1)
+
+
+def test_render(cube_instance) -> None:
+    from cube_env.render.render import render
+    render(cube_instance)    

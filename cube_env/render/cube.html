@@ -19,76 +19,89 @@ auther Martin PAUCOT
     <div class="viewport">
       <div class="cube">
         <div class="side">
-          <div class="one center"></div>
-          <div class="one top"></div>
-          <div class="one bottom"></div>
-          <div class="one right"></div>
-          <div class="one left"></div>
-          <div class="one top right"></div>
-          <div class="one top left"></div>
-          <div class="one bottom right"></div>
-          <div class="one bottom left"></div>
+          <div id="cell4" class="one center">1</div>
+          <div id="cell1" class="one top"></div>
+          <div id="cell7" class="one bottom"></div>
+          <div id="cell5" class="one right"></div>
+          <div id="cell3" class="one left"></div>
+          <div id="cell2" class="one top right"></div>
+          <div id="cell0" class="one top left"></div>
+          <div id="cell8" class="one bottom right"></div>
+          <div id="cell6" class="one bottom left"></div>
         </div>
         <div class="side">
-          <div class="two center"></div>
-          <div class="two top"></div>
-          <div class="two bottom"></div>
-          <div class="two right"></div>
-          <div class="two left"></div>
-          <div class="two top right"></div>
-          <div class="two top left"></div>
-          <div class="two bottom right"></div>
-          <div class="two bottom left"></div>
+          <div id="cell31" class="two center">2</div>
+          <div id="cell28" class="two top"></div>
+          <div id="cell34" class="two bottom"></div>
+          <div id="cell32" class="two right"></div>
+          <div id="cell30" class="two left"></div>
+          <div id="cell29" class="two top right"></div>
+          <div id="cell27" class="two top left"></div>
+          <div id="cell35" class="two bottom right"></div>
+          <div id="cell33" class="two bottom left"></div>
         </div>
         <div class="side">
-          <div class="three center"></div>
-          <div class="three top"></div>
-          <div class="three bottom"></div>
-          <div class="three right"></div>
-          <div class="three left"></div>
-          <div class="three top right"></div>
-          <div class="three top left"></div>
-          <div class="three bottom right"></div>
-          <div class="three bottom left"></div>
+          <div id="cell22" class="three center">3</div>
+          <div id="cell19" class="three top"></div>
+          <div id="cell25" class="three bottom"></div>
+          <div id="cell23" class="three right"></div>
+          <div id="cell21" class="three left"></div>
+          <div id="cell20" class="three top right"></div>
+          <div id="cell18" class="three top left"></div>
+          <div id="cell26" class="three bottom right"></div>
+          <div id="cell24" class="three bottom left"></div>
         </div>
         <div class="side">
-          <div class="four center"></div>
-          <div class="four top"></div>
-          <div class="four bottom"></div>
-          <div class="four right"></div>
-          <div class="four left"></div>
-          <div class="four top right"></div>
-          <div class="four top left"></div>
-          <div class="four bottom right"></div>
-          <div class="four bottom left"></div>
+          <div id="cell40" class="four center">4</div>
+          <div id="cell37" class="four top"></div>
+          <div id="cell43" class="four bottom"></div>
+          <div id="cell41" class="four right"></div>
+          <div id="cell39" class="four left"></div>
+          <div id="cell38" class="four top right"></div>
+          <div id="cell36" class="four top left"></div>
+          <div id="cell44" class="four bottom right"></div>
+          <div id="cell42" class="four bottom left"></div>
         </div>
         <div class="side">
-          <div class="five center"></div>
-          <div class="five top"></div>
-          <div class="five bottom"></div>
-          <div class="five right"></div>
-          <div class="five left"></div>
-          <div class="five top right"></div>
-          <div class="five top left"></div>
-          <div class="five bottom right"></div>
-          <div class="five bottom left"></div>
+          <div id="cell49" class="five center">5</div>
+          <div id="cell46" class="five top"></div>
+          <div id="cell52" class="five bottom"></div>
+          <div id="cell47" class="five right"></div>
+          <div id="cell45" class="five left"></div>
+          <div id="cell50" class="five top right"></div>
+          <div id="cell48" class="five top left"></div>
+          <div id="cell53" class="five bottom right"></div>
+          <div id="cell51" class="five bottom left"></div>
         </div>
         <div class="side">
-          <div class="six center"></div>
-          <div class="six top"></div>
-          <div class="six bottom"></div>
-          <div class="six right"></div>
-          <div class="six left"></div>
-          <div class="six top right"></div>
-          <div class="six top left"></div>
-          <div class="six bottom right"></div>
-          <div class="six bottom left"></div>
+          <div id="cell13" class="six center">6</div>
+          <div id="cell10" class="six top"></div>
+          <div id="cell16" class="six bottom"></div>
+          <div id="cell14" class="six right"></div>
+          <div id="cell12" class="six left"></div>
+          <div id="cell11" class="six top right"></div>
+          <div id="cell9" class="six top left"></div>
+          <div id="cell17" class="six bottom right"></div>
+          <div id="cell15" class="six bottom left"></div>
         </div>
       </div>
     </div>
   </div>
 
   <script type="text/javascript" src="./cube.js"></script>
+  <script type="text/javascript" src="./color_cube.js"></script>
 </body>
 
 </html>
+<!--
+  In the solved state we have the following mapping
+state     :  0 3 1 5 4 2
+cube face :  1 2 6 4 5 3
+color     :  r w o y g b
+             e i r e r l
+             d t a l e u
+               e n l e e
+                 g o n
+                 e w
+  cellx >-> state[x div 9][x mod 9]
+-->

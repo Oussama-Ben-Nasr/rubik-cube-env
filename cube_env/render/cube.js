@@ -345,3 +345,5 @@ new Cube({
     viewport: viewport,
     element: document.getElementsByClassName('cube')[0]
 });
+
+//document.getElementById("cell4").style.backgroundColor = "black"
