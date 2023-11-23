@@ -82,3 +82,11 @@ def test_min_heap_can_extract_max_in_sorted_order() -> None:
     min_heap = MinHeap(l)
     for elem in sorted(l):
         assert elem == min_heap.extract_min()
+
+
+def test_min_heap_can_increment_at_index() -> None:
+    l = [5, 17, 10, 1, 2, 5, 19]
+    min_heap = MinHeap(l)
+    pre_increment = min_heap.mem[3]
+    min_heap.increment_at_index(3, -69)
+    assert min_heap.peek() == pre_increment-69
