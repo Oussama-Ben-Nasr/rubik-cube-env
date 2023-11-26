@@ -1,35 +1,36 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 class HeapStrategy(ABC):
     @abstractmethod
-    def heap_sift_down_order(self, first: int, second: int) -> bool:
+    def heap_sift_down_order(self, first, second) -> bool:
         pass
     
     @abstractmethod
-    def heap_sift_up_order(self, first: int, second: int) -> bool:
+    def heap_sift_up_order(self, first, second) -> bool:
         pass
 
 class MaxHeapStrategy(HeapStrategy):
-    def heap_sift_down_order(self, first: int, second: int) -> bool:
-        return first >= second
+    def heap_sift_down_order(self, first, second) -> bool:
+        return first.__ge__(second)
     
-    def heap_sift_up_order(self, first: int, second: int) -> bool:
-        return first < second
+    def heap_sift_up_order(self, first, second) -> bool:
+        return first.__lt__(second)
 
 class MinHeapStrategy(HeapStrategy):
-    def heap_sift_down_order(self, first: int, second: int) -> bool:
-        return first <= second
+    def heap_sift_down_order(self, first, second) -> bool:
+        return first.__le__(second)
     
     def heap_sift_up_order(self, first: int, second: int) -> bool:
-        return first > second
+        return first.__gt__(second)
 
 class Heap(ABC):
     """Heap commun implementation."""
-    mem: list
+    mem: List
     def __init__(self) -> None:
-        self.mem = []
+        self.mem = list()
 
-    def peek(self) -> int:
+    def peek(self):
         if self.empty:
             raise Exception("Peek on empty heap.")
         return self.mem[0]
@@ -51,7 +52,7 @@ class Heap(ABC):
     def has_parent(self, index: int) -> bool:
         return self.parent_index(index) >= 0
     
-    def insert(self, key: int, order: HeapStrategy) -> None:
+    def insert(self, key, order: HeapStrategy) -> None:
         self.mem.append(key)
         self.sift_up(self.size-1, order)
     
@@ -156,9 +157,9 @@ class MinHeap(Heap):
 
     def extract_min(self) -> int:
         self.swap_index(0, self.size-1)
-        max = self.mem.pop()
+        min = self.mem.pop()
         self.sift_down(0, MinHeapStrategy())
-        return max
+        return min
     
     def delete_min(self) -> None:
         self.swap_index(0, self.size-1)
