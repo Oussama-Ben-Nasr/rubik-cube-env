@@ -1,5 +1,4 @@
 import * as THREE from "three";
-// FIX: use the same unpkg base as the importmap so module resolution is consistent
 import { OrbitControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/OrbitControls.js";
 
 // Map face index (as stored in Python) → hex color
@@ -26,6 +25,7 @@ window.move = async (a) => {
 
 window.reset = async () => {
     await fetch(`/reset`, { method: "POST" });
+    controls.reset();
     await loadAndRender();
 };
 
@@ -107,9 +107,6 @@ function createCubie(cubie) {
 
     const offset = 0.5;
 
-    // FIX: resolve the actual sticker color from the face's color index in state.
-    // Previously the code always used the face's default color (e.g. FACE_COLORS.U
-    // was always white), ignoring what color the state said was there after moves.
     const resolve = (faceColorIndex) => INDEX_COLORS[faceColorIndex];
 
     if (colors.U !== undefined) {
@@ -164,7 +161,7 @@ function createCubie(cubie) {
 }
 
 function renderCube(state) {
-    clearScene();   // FIX: was named 'clear()' — shadowed the built-in window.clear
+    clearScene();
 
     for (const cubie of state) {
         const mesh = createCubie(cubie);

@@ -38,6 +38,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 git clone <repository-url>
 cd rubik-cube-env
 uv sync
+uv run pytest tests/ -v
 uv run uvicorn cube_env.render.render:app --reload
 ```
 

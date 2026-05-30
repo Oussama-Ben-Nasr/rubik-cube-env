@@ -1,32 +1,25 @@
 name: rubik-cube
-on: [push]
+
+on: [push, pull_request]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, 3.12]
     runs-on: ubuntu-latest
 
     steps:
-          - name: Checkout
-            uses: actions/checkout@v2
-            with:
-              fetch-depth: 0
-              
-          - name: Switch to Current Branch
-            run: git checkout ${{ env.BRANCH }}
-                  
-          - name: Set up Python ${{ matrix.python-version }}
-            uses: actions/setup-python@v1
-            with:
-              python-version: ${{ matrix.python-version }}
-          - name: Install dependencies
-            run: |
-              python -m pip install --upgrade pip
-              pip install -r requirements.txt
-          - name: Compile for type safety
-            run: mypy .
-          - name: Run unit tests
-            run: python -m pytest -rP
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run unit tests
+        run: uv run pytest tests/ -v

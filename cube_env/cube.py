@@ -41,9 +41,6 @@ class RubikCube3D:
 
         return cubies
 
-    # -------------------------
-    # CORE SELECTOR
-    # -------------------------
     def select(self, axis, value):
         return [c for c in self.cubies if c.pos[axis] == value]
 
@@ -100,10 +97,6 @@ class RubikCube3D:
             cubie.pos = np.array([y, -x, z])
             self._rotate_colors(cubie, self._Z_COLOR_CCW)
 
-    # -------------------------
-    # MOVES (6 faces × 2)
-    # -------------------------
-
     def U(self, dir=1):
         for c in self.select(Y, 1):
             self.rot_y(c, dir)
@@ -128,9 +121,6 @@ class RubikCube3D:
         for c in self.select(X, 1):
             self.rot_x(c, dir)
 
-    # -------------------------
-    # ACTION DISPATCH (0–11)
-    # -------------------------
     def apply_action(self, action: int):
         moves = [
             lambda: self.U(1),
@@ -150,9 +140,6 @@ class RubikCube3D:
             raise ValueError("action must be 0–11")
         moves[action]()
 
-    # -------------------------
-    # EXPORT FOR THREE.JS
-    # -------------------------
     def export(self):
         return [
             {
