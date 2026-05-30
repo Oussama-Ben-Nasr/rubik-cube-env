@@ -1,30 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Rubik Cube</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rubik's Cube</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div id="ui">
-    <button onclick="move(0)">U</button>
-    <button onclick="move(1)">U'</button>
-    <button onclick="move(2)">D</button>
-    <button onclick="move(3)">D'</button>
-    <button onclick="move(4)">F</button>
-    <button onclick="move(5)">F'</button>
-    <button onclick="move(6)">B</button>
-    <button onclick="move(7)">B'</button>
-    <button onclick="move(8)">L</button>
-    <button onclick="move(9)">L'</button>
-    <button onclick="move(10)">R</button>
-    <button onclick="move(11)">R'</button>
-    <button onclick="reset()">Reset</button>
+<!-- Top bar: title + move counter -->
+<div id="topbar">
+    <span class="app-title">Rubik's cube</span>
+    <div id="move-counter">moves: <span id="count">0</span></div>
 </div>
 
-<div id="app"></div>
+<!-- Three.js canvas renders here (appended by cube.js) -->
+
+<!-- Bottom controls panel -->
+<div id="ui">
+    <div class="panel-label">moves</div>
+
+    <div id="moves-grid">
+        <div class="btn-pair">
+            <span class="face-label">U</span>
+            <button onclick="doMove(0)">U</button>
+            <button onclick="doMove(1)" class="prime">U'</button>
+        </div>
+        <div class="btn-pair">
+            <span class="face-label">D</span>
+            <button onclick="doMove(2)">D</button>
+            <button onclick="doMove(3)" class="prime">D'</button>
+        </div>
+        <div class="btn-pair">
+            <span class="face-label">F</span>
+            <button onclick="doMove(4)">F</button>
+            <button onclick="doMove(5)" class="prime">F'</button>
+        </div>
+        <div class="btn-pair">
+            <span class="face-label">B</span>
+            <button onclick="doMove(6)">B</button>
+            <button onclick="doMove(7)" class="prime">B'</button>
+        </div>
+        <div class="btn-pair">
+            <span class="face-label">L</span>
+            <button onclick="doMove(8)">L</button>
+            <button onclick="doMove(9)" class="prime">L'</button>
+        </div>
+        <div class="btn-pair">
+            <span class="face-label">R</span>
+            <button onclick="doMove(10)">R</button>
+            <button onclick="doMove(11)" class="prime">R'</button>
+        </div>
+    </div>
+
+    <div id="action-row">
+        <button id="btn-reset" onclick="doReset()">↺ reset</button>
+        <button id="btn-scramble" onclick="doScramble()">⚡ scramble</button>
+    </div>
+</div>
 
 <script type="importmap">
 {
@@ -35,6 +69,27 @@
 </script>
 
 <script type="module" src="/static/cube.js"></script>
+
+<script>
+    // Move counter (read by cube.js via window.incrementCount / window.resetCount)
+    let _count = 0;
+    const countEl = document.getElementById('count');
+
+    window.incrementCount = () => { countEl.textContent = ++_count; };
+    window.resetCount     = () => { _count = 0; countEl.textContent = 0; };
+
+    // Scramble: 20 random moves
+    window.doScramble = async () => {
+        if (document.body.classList.contains('animating')) return;
+        for (let i = 0; i < 20; i++) {
+            await window.move(Math.floor(Math.random() * 12));
+        }
+        window.resetCount();
+    };
+
+    window.doMove  = (a) => { window.move(a); window.incrementCount(); };
+    window.doReset = () => { window.reset(); window.resetCount(); };
+</script>
 
 </body>
 </html>

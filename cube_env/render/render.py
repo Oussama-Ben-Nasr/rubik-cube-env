@@ -25,6 +25,10 @@ def move(action: int):
     return {"status": "ok"}
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse("cube_env/render/favicon.ico")
+
 @app.post("/reset")
 def reset():
     cube.reset()

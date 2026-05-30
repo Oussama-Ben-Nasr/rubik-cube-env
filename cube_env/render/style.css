@@ -1,27 +1,161 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html, body {
-    margin: 0;
-    height: 100%;
+    width: 100%; height: 100%;
+    background: #111111;
+    font-family: ui-monospace, 'SF Mono', 'Fira Code', monospace;
     overflow: hidden;
-    background: #111;
-    font-family: Arial;
 }
 
-#ui {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+/* Canvas fills the whole viewport — Three.js renders here */
+canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+}
+
+/* ── Top bar ── */
+#topbar {
+    position: fixed;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
-    background: rgba(255,255,255,0.9);
-    padding: 10px;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(20, 20, 20, 0.85);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 8px 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#topbar .app-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #555;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+#move-counter {
+    font-size: 11px;
+    color: #555;
+}
+#move-counter span {
+    color: #888;
+    min-width: 20px;
+    display: inline-block;
+    text-align: right;
+}
+
+/* ── Bottom controls panel ── */
+#ui {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(20, 20, 20, 0.88);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 14px 18px 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 340px;
+}
+
+.panel-label {
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+/* 6-column grid, one column per face */
+#moves-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.btn-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.face-label {
+    font-size: 10px;
+    color: #444;
 }
 
 button {
-    margin: 2px;
-    padding: 6px 10px;
+    width: 100%;
+    padding: 7px 0;
+    background: #1e1e1e;
+    border: 0.5px solid rgba(255,255,255,0.09);
+    border-radius: 6px;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
+    font-family: inherit;
+    transition: background 0.12s, color 0.12s, opacity 0.12s;
+    user-select: none;
 }
 
-canvas {
-    display: block;
+button.prime {
+    color: #666;
+    font-size: 12px;
 }
+
+button:hover:not(:disabled) {
+    background: #2a2a2a;
+    color: #ddd;
+}
+
+button:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Bottom action row */
+#action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+#btn-reset {
+    flex: 1;
+    color: #666;
+    font-size: 12px;
+    padding: 8px 0;
+}
+
+#btn-scramble {
+    flex: 1;
+    background: #1a221a;
+    border-color: rgba(80,180,80,0.2);
+    color: #5a9;
+    font-size: 12px;
+    padding: 8px 0;
+}
+
+#btn-scramble:hover:not(:disabled) {
+    background: #1e2a1e;
+    color: #6bc;
+}
+
+/* Disabled state while animating */
+body.animating button { pointer-events: none; opacity: 0.4; }
