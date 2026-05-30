@@ -98,8 +98,6 @@ curl -X POST http://localhost:8000/reset
 
 ## Roadmap
 
-- [ ] Move animations
-- [ ] Scramble generator
 - [ ] Solver integration
 - [ ] OpenAI Gym compatible interface
 

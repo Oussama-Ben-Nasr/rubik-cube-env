@@ -10,6 +10,7 @@ dependencies = [
     "uvicorn[standard]",
     "numpy",
     "redis",
+    "magiccube>=1.2.0",
 ]
 
 [dependency-groups]
