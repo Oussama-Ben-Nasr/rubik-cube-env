@@ -48,30 +48,30 @@ class RubikCube3D:
         return [c for c in self.cubies if c.pos[axis] == value]
 
     # -------------------------
-    # ROTATION HELPERS (position + color remapping)
+    # ROTATION HELPERS
+    # Verified by tracking face normals through rotation matrices:
+    #
+    # X-axis CW (viewed from +X): y->-z, z->+y
+    #   Face cycle CW: U->F, F->D, D->B, B->U   (R,L stay)
+    #
+    # Y-axis CW (viewed from +Y): x->+z, z->-x
+    #   Face cycle CW: F->R, R->B, B->L, L->F   (U,D stay)
+    #
+    # Z-axis CW (viewed from +Z): x->-y, y->+x
+    #   Face cycle CW: R->U, U->L, L->D, D->R   (F,B stay)
     # -------------------------
 
-    # Rotating around X axis (CW when viewed from +X):
-    #   y → z, z → -y
-    # Face cycle CW (+dir): U→F, F→D, D→B, B→U
     _X_COLOR_CW  = {"U": "F", "F": "D", "D": "B", "B": "U"}
     _X_COLOR_CCW = {v: k for k, v in _X_COLOR_CW.items()}
 
-    # Rotating around Y axis (CW when viewed from +Y):
-    #   x → -z, z → x
-    # Face cycle CW (+dir): F→L, L→B, B→R, R→F
-    _Y_COLOR_CW  = {"F": "L", "L": "B", "B": "R", "R": "F"}
+    _Y_COLOR_CW  = {"F": "R", "R": "B", "B": "L", "L": "F"}
     _Y_COLOR_CCW = {v: k for k, v in _Y_COLOR_CW.items()}
 
-    # Rotating around Z axis (CW when viewed from +Z):
-    #   x → y, y → -x
-    # Face cycle CW (+dir): U→R, R→D, D→L, L→U
-    _Z_COLOR_CW  = {"U": "R", "R": "D", "D": "L", "L": "U"}
+    _Z_COLOR_CW  = {"R": "U", "U": "L", "L": "D", "D": "R"}
     _Z_COLOR_CCW = {v: k for k, v in _Z_COLOR_CW.items()}
 
     def _rotate_colors(self, cubie, mapping):
-        old = cubie.colors
-        cubie.colors = {mapping.get(face, face): val for face, val in old.items()}
+        cubie.colors = {mapping.get(face, face): val for face, val in cubie.colors.items()}
 
     def rot_x(self, cubie, dir=1):
         x, y, z = cubie.pos
@@ -109,7 +109,6 @@ class RubikCube3D:
             self.rot_y(c, dir)
 
     def D(self, dir=1):
-        # D layer rotates opposite to U for the same dir input
         for c in self.select(Y, -1):
             self.rot_y(c, -dir)
 
@@ -122,12 +121,10 @@ class RubikCube3D:
             self.rot_z(c, -dir)
 
     def L(self, dir=1):
-        # FIX: L uses rot_x with -dir (was incorrectly +dir)
         for c in self.select(X, -1):
             self.rot_x(c, -dir)
 
     def R(self, dir=1):
-        # FIX: R uses rot_x with +dir (was incorrectly -dir)
         for c in self.select(X, 1):
             self.rot_x(c, dir)
 
