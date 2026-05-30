@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
-from cube_env.cube import RubikCube3D
+from src.main.core.cube import RubikCube3D
 
 app = FastAPI()
 
@@ -10,13 +9,13 @@ cube = RubikCube3D()
 
 app.mount(
     "/static",
-    StaticFiles(directory="cube_env/render"),
+    StaticFiles(directory="src/main/ui"),
     name="static"
 )
 
 @app.get("/")
 def home():
-    return FileResponse("cube_env/render/index.html")
+    return FileResponse("src/main/ui/index.html")
 
 
 @app.post("/move/{action}")
@@ -27,7 +26,7 @@ def move(action: int):
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
-    return FileResponse("cube_env/render/favicon.ico")
+    return FileResponse("src/main/ui/favicon.ico")
 
 @app.post("/reset")
 def reset():

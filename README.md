@@ -9,13 +9,12 @@ A 3D Rubik's Cube simulator with a FastAPI backend and interactive Three.js visu
 ## What's inside
 
 ```text
-cube_env/
-├── render/
-│   ├── render.py      ← FastAPI app
-│   ├── index.html
-│   ├── cube.js        ← Three.js renderer
-│   └── style.css
-└── cube.py            ← Core cube logic
+src/
+├── main/
+│   ├── api/
+│   ├── core/
+│   └── ui/
+└── test/
 ```
 
 ---
@@ -38,8 +37,8 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 git clone <repository-url>
 cd rubik-cube-env
 uv sync
-uv run pytest tests/ -v
-uv run uvicorn cube_env.render.render:app --reload
+uv run pytest src/test/ -v
+uv run uvicorn src.main.api.render:app --reload
 ```
 
 Open **http://localhost:8000** — that's it.
@@ -105,10 +104,6 @@ curl -X POST http://localhost:8000/reset
 - [ ] OpenAI Gym compatible interface
 
 ---
-
-## Author
-
-**Oussama Ben Nasr** — Software & Data Engineer
 
 ## License
 

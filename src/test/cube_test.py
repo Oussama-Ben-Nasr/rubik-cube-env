@@ -1,5 +1,5 @@
 import pytest
-from cube_env.cube import RubikCube3D
+from src.main.core.cube import RubikCube3D
 
 
 def solved_export():
