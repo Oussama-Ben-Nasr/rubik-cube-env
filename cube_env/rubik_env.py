@@ -43,6 +43,11 @@ class RubikCube:
                 [3, 3, 3, 4, 4, 4, 5, 5, 5],
             ]
         )
+    def _rot_cw(self, face):
+        return np.rot90(face, -1)
+
+    def _rot_ccw(self, face):
+        return np.rot90(face, 1)
 
     def apply_action(self, action: int) -> None:
         """

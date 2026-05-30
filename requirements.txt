@@ -1,5 +1,0 @@
-numpy
-pytest
-mypy
-redis
-types-dataclasses

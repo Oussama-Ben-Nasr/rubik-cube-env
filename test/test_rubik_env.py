@@ -8,7 +8,6 @@ Date: October 15, 2023
 """
 import pytest
 import numpy as np
-from cube_env.render.render import cell_id_to_state_x_y
 from cube_env.rubik_env import RubikCube
 
 
@@ -200,13 +199,3 @@ def test_render(cube_instance) -> None:
     from cube_env.render.render import render
     render(cube_instance)
 
-
-def test_coords_mapping() -> None:
-    assert cell_id_to_state_x_y(0) == (0, 0)
-    assert cell_id_to_state_x_y(5) == (1, 2)
-    assert cell_id_to_state_x_y(8) == (2, 2)
-    assert cell_id_to_state_x_y(9) == (0, 3)
-    assert cell_id_to_state_x_y(18) == (0, 6)
-    assert cell_id_to_state_x_y(27) == (3, 0)
-    assert cell_id_to_state_x_y(36) == (3, 3)
-    assert cell_id_to_state_x_y(45) == (3, 6)

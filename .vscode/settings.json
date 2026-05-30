@@ -6,7 +6,7 @@
     "python.testing.pytestEnabled": true,
     "editor.defaultFormatter": "ms-python.vscode-pylance",
     "editor.codeActionsOnSave": {
-        "source.sortImports": true,
+        "source.sortImports": "explicit"
     },
     "python.testing.unittestArgs": [
         "-v",

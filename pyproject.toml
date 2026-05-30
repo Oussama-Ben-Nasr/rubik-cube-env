@@ -1,0 +1,19 @@
+[project]
+name = "rubik-cube-env"
+version = "0.1.0"
+description = "Rubik Cube Environment"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "numpy",
+    "redis",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "mypy",
+]
