@@ -21,7 +21,7 @@ def home():
 
 @app.post("/move/{action}")
 def move(action: int):
-    cube.apply_action(action)   # FIXED below
+    cube.apply_action(action)
     return {"status": "ok"}
 
 
