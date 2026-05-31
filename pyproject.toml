@@ -11,6 +11,8 @@ dependencies = [
     "numpy",
     "redis",
     "rubiktwophase>=1.1.1",
+    "psycopg[binary]>=3.3.4",
+    "python-dotenv>=1.2.2",
 ]
 
 [dependency-groups]

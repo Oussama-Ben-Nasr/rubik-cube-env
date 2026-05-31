@@ -7,6 +7,12 @@ from random import randint, seed
 import logging
 from src.main.core.solver import solution
 from src.main.core.consts import actions_to_codes
+from fastapi import Body
+from src.main.api.db import get_conn
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timezone
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(message)s")
 logger = logging.getLogger(__name__)
@@ -35,18 +41,30 @@ def move(action: int):
     historical_moves.append(actions_to_codes[action])
     return {"status": "ok"}
 
+@app.post("/finished")
+def finished():
+    cube._competing = False
+    return {"status": "ok"}
+
 @app.post("/scramble")
 def scramble():
-    seed(12345)
+    is_dev = os.environ.get("DEV", "true").lower() == "true"
+    if is_dev:
+        cube.apply_action(0)
+        cube.apply_action(0)
+        cube.competitor_start()
+        return {"status": "ok"}
+    
     scrambling_sequence = ""
     for _ in range(20):
         action = randint(0, 11)
         cube.apply_action(action)
         scrambling_sequence += f"{actions_to_codes[action]} "
     logger.info(scrambling_sequence)
+    cube.competitor_start()
     return {"status": "ok"}
 
-@app.post("/solve")
+@app.post("/solution")
 def solve_cube():
     try:
         return solution(cube)
@@ -71,3 +89,63 @@ def reset():
 @app.get("/cube")
 def get_cube():
     return cube.export()
+
+@app.get("/cube-export")
+def get_cube():
+    return cube.export_as_kociemba_string()
+
+@app.post("/solve")
+def save_solve(payload: dict = Body(...)):
+    conn = get_conn()
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            insert into solves (
+                solve_time_ms,
+                moves
+            )
+            values (%s, %s)
+            """,
+            (
+                payload["solve_time_ms"],
+                payload["moves"],
+            ),
+        )
+
+    conn.commit()
+
+    return {"success": True}
+
+@app.get("/status")
+def status():
+    return cube.status()
+
+
+@app.get("/leaderboard")
+def leaderboard():
+    conn = get_conn()
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            select
+                solve_time_ms,
+                moves,
+                created_at
+            from solves
+            order by solve_time_ms asc
+            limit 20
+            """
+        )
+
+        rows = cur.fetchall()
+
+    return [
+        {
+            "solve_time_ms": row[0],
+            "moves": row[1],
+            "created_at": row[2],
+        }
+        for row in rows
+    ]

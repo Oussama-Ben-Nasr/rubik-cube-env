@@ -22,6 +22,7 @@ canvas {
     z-index: 10;
     display: flex;
     align-items: center;
+    flex-direction: column; align-items: center; gap: 5px;
     gap: 20px;
     background: rgba(20, 20, 20, 0.85);
     border: 0.5px solid rgba(255,255,255,0.08);
@@ -37,6 +38,13 @@ canvas {
     color: #555;
     text-transform: uppercase;
     user-select: none;
+}
+#timer-display {
+    text-align: center;
+    font-family: monospace; 
+    font-size: 1.5rem; 
+    color: #ffffff; 
+    margin-bottom: 10px;
 }
 
 #move-counter {

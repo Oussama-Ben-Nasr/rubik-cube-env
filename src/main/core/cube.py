@@ -1,5 +1,6 @@
 import numpy as np
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 X, Y, Z = 0, 1, 2
 
@@ -11,11 +12,27 @@ class Cubie:
 
 
 class RubikCube3D:
+    _move_count: int = 0
+    _start_solve = None
+    _competing = False
+
+    def reset_moves_count(self):
+        self._move_count = 0
+        self._competing = False
+
+    def competitor_start(self):
+        self._move_count = 0
+        self._competing = True
+        self._start_solve = datetime.now(timezone.utc).isoformat()
+    
 
     def __init__(self):
         self.reset()
 
     def reset(self):
+        self.reset_moves_count()
+        self._start_solve = None
+        self._competing = False
         self.cubies = self._init_cubies()
 
     def _init_cubies(self):
@@ -138,6 +155,7 @@ class RubikCube3D:
         ]
         if not (0 <= action <= 11):
             raise ValueError("action must be 0–11")
+        self._move_count += 1
         moves[action]()
 
     def export(self):
@@ -201,3 +219,18 @@ class RubikCube3D:
                 color_int = cubie['colors'][face_name]
                 kociemba_string += color_map[color_int]
         return kociemba_string
+    
+    def is_solved(self):
+        return self.export_as_kociemba_string() == "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
+    
+    def status(self):
+            return {
+                "solved": self.is_solved(),
+                "real_moves_count": self._move_count,
+                "solve_time": datetime.now(timezone.utc).isoformat(),
+                "start_time": self._start_solve,
+                "is_competing": self._competing
+            }
+
+    def is_competing(self):
+        return self._competing and self._start_solve != None

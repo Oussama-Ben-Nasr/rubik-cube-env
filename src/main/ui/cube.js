@@ -107,6 +107,32 @@ window.move = async (actionId) => {
 
     // 3. Rebuild from ground-truth state
     const state = await fetch("/cube").then(r => r.json());
+    const status = await fetch("/status").then(r => r.json());
+    
+    if (status.is_competing && status.solved) {
+        console.log(status.solve_time, status.real_moves_count );
+        const solveMs =
+        new Date(status.solve_time) -
+        new Date(status.start_time);
+        
+        await fetch("/solve", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                solve_time_ms: solveMs,
+                moves: status.real_moves_count,
+            }),
+        });
+
+    clearInterval(timerInterval);
+    
+    alert(
+        `Solved in ${Math.round(solveMs / 1000)}s using ${status.real_moves_count} moves`
+    );
+    await fetch("finished", { method: "POST" });
+}
     renderCube(state);
 
     animating = false;
@@ -118,6 +144,11 @@ window.reset = async () => {
     await fetch(`/reset`, { method: "POST" });
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
+    const status = await fetch("/status").then(r => r.json());
+    if (!status.is_competing) {
+        document.getElementById('timer-display').textContent = `--:--:--`;
+        if (timerInterval) clearInterval(timerInterval);
+    }
     await animateCameraReset();
 };
 
@@ -417,8 +448,9 @@ window.doScramble = async () => {
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
     moveHistory.length = 0;
-redoHistory.length = 0;
-updateUndoRedoButtons();
+    redoHistory.length = 0;
+    updateUndoRedoButtons();
+    startCompetitionTimer();
     window.resetCount();
 };
 
@@ -519,4 +551,26 @@ function animateCameraReset() {
 
         requestAnimationFrame(tick);
     });
+}
+
+let timerInterval = null;
+let startTime = null;
+
+async function startCompetitionTimer() {
+
+    if (timerInterval) clearInterval(timerInterval);
+    
+    startTime = Date.now();
+    
+
+    timerInterval = setInterval(() => {
+        const elapsedMs = Date.now() - startTime;
+
+        const totalSecs = Math.floor(elapsedMs / 1000);
+        const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSecs % 60).padStart(2, '0');
+
+        document.getElementById('timer-display').textContent = `${hrs}:${mins}:${secs}`;
+    }, 1000);
 }

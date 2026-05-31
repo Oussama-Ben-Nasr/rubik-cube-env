@@ -12,7 +12,8 @@
 <!-- Top bar: title + move counter -->
 <div id="topbar">
     <span class="app-title">Rubik's cube</span>
-    <div id="move-counter">moves: <span id="count">0</span></div>
+    <div id="move-counter">moves: <span id="count">-</span></div>
+    <div id="timer-display" >--:--:-- </div>
 </div>
 
 <!-- Three.js canvas renders here (appended by cube.js) -->
@@ -56,7 +57,7 @@
 
     <div id="action-row">
         <button id="btn-reset" onclick="doReset()">↺ reset</button>
-        <button id="btn-scramble" onclick="doScramble()">⚡ scramble</button>
+        <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
         <button id="btn-undo" onclick="doUndo()">↩ undo</button>
         <button id="btn-redo" onclick="doRedo()">↪ redo</button>
     </div>
