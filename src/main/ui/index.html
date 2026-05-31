@@ -4,8 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rubik's Cube</title>
-<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/style.css?v2">
 </head>
+<div id="nickname-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+  <div style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:16px;">
+    <p style="color:#fff; font-family:monospace; font-size:13px; letter-spacing:0.05em;">ENTER NICKNAME</p>
+    <p style="color:#555; font-family:monospace; font-size:11px; margin-top:-8px;">Your name will appear on the leaderboard</p>
+    <input id="nickname-input" type="text" maxlength="20" placeholder="e.g. speedcuber42"
+      style="background:#111; border:0.5px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:monospace; font-size:14px; padding:10px 12px; outline:none; width:100%;" />
+    <div style="display:flex; gap:8px;">
+      <button id="nickname-cancel" style="flex:1; padding:10px; background:#1e1e1e; border:0.5px solid rgba(255,255,255,0.09); border-radius:8px; color:#666; font-family:monospace; font-size:12px; cursor:pointer;">cancel</button>
+      <button id="nickname-ok" style="flex:2; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">confirm ↵</button>
+    </div>
+  </div>
+</div>
 <body>
 <div id="sidebar">
   <span class="app-title">Rubik's cube</span>
@@ -43,6 +55,7 @@
     <button onclick="shareTo('telegram')">Telegram</button>
 </div>
 </div>
+<div id="nickname-tag" style="margin-top: auto; padding-top: 8px;"></div>
 </div>
 
 <script type="importmap">

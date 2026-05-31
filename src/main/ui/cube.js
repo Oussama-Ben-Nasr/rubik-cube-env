@@ -86,13 +86,50 @@ const INVERSE_MOVE = {
 
 init();
 await loadAndRender();
+function askNickname() {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('nickname-modal');
+        const input = document.getElementById('nickname-input');
+        const ok    = document.getElementById('nickname-ok');
+        const cancel = document.getElementById('nickname-cancel');
+
+        input.value = '';
+        modal.style.display = 'flex';
+        setTimeout(() => input.focus(), 50);
+
+        const finish = (val) => {
+            modal.style.display = 'none';
+            ok.removeEventListener('click', onOk);
+            cancel.removeEventListener('click', onCancel);
+            input.removeEventListener('keydown', onKey);
+            resolve(val);
+        };
+        const onOk     = () => finish(input.value.trim() || 'Anonymous');
+        const onCancel = () => finish(null);
+        const onKey    = (e) => { if (e.key === 'Enter') onOk(); if (e.key === 'Escape') onCancel(); };
+
+        ok.addEventListener('click', onOk);
+        cancel.addEventListener('click', onCancel);
+        input.addEventListener('keydown', onKey);
+    });
+}
+function showNicknameTag(name) {
+    let tag = document.getElementById('nickname-tag');
+    if (!tag) {
+        tag = document.createElement('div');
+        tag.id = 'nickname-tag';
+        document.body.appendChild(tag);
+    }
+    tag.textContent = name;
+}
 if (!nickname) {
-    nickname = prompt("Nickname for leaderboard?") || "anonymous";
+    nickname = await askNickname();;
     localStorage.setItem(
         "rubiks_nickname",
         nickname
     );
 }
+if(nickname) showNicknameTag(nickname);
 // ---------------------------------------------------------------------------
 // Public API (called from HTML buttons)
 // ---------------------------------------------------------------------------
@@ -470,6 +507,15 @@ window.resetCount     = () => { _count = 0; countEl.textContent = 0; };
 // Scramble: 20 random moves
 window.doScramble = async () => {
     if (document.body.classList.contains('animating')) return;
+    if (!nickname) {
+        nickname = await askNickname();;
+        localStorage.setItem(
+            "rubiks_nickname",
+            nickname
+        );
+    }
+    if(!nickname) return;
+    showNicknameTag(nickname);
     // for (let i = 0; i < 20; i++) {
     //     await window.move(Math.floor(Math.random() * 12));
     // }
