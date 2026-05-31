@@ -6,62 +6,36 @@
 <title>Rubik's Cube</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body>
+<div id="sidebar">
+  <span class="app-title">Rubik's cube</span>
+  <div id="timer-display">--:--:--</div>
+  <div id="move-counter">moves: <span id="count">-</span></div>
 
-<!-- Top bar: title + move counter -->
-<div id="topbar">
-    <span class="app-title">Rubik's cube</span>
-    <div id="move-counter">moves: <span id="count">-</span></div>
-    <div id="timer-display" >--:--:-- </div>
-    <div id="leaderboard"></div>
-</div>
+  <hr class="divider">
 
-<!-- Three.js canvas renders here (appended by cube.js) -->
+  <div id="leaderboard"></div>
 
-<!-- Bottom controls panel -->
-<div id="ui">
-    <div class="panel-label">moves</div>
+  <hr class="divider">
 
-    <div id="moves-grid">
-        <div class="btn-pair">
-            <span class="face-label">U</span>
-            <button onclick="doMove(0)">U</button>
-            <button onclick="doMove(1)" class="prime">U'</button>
-        </div>
-        <div class="btn-pair">
-            <span class="face-label">D</span>
-            <button onclick="doMove(2)">D</button>
-            <button onclick="doMove(3)" class="prime">D'</button>
-        </div>
-        <div class="btn-pair">
-            <span class="face-label">F</span>
-            <button onclick="doMove(4)">F</button>
-            <button onclick="doMove(5)" class="prime">F'</button>
-        </div>
-        <div class="btn-pair">
-            <span class="face-label">B</span>
-            <button onclick="doMove(6)">B</button>
-            <button onclick="doMove(7)" class="prime">B'</button>
-        </div>
-        <div class="btn-pair">
-            <span class="face-label">L</span>
-            <button onclick="doMove(8)">L</button>
-            <button onclick="doMove(9)" class="prime">L'</button>
-        </div>
-        <div class="btn-pair">
-            <span class="face-label">R</span>
-            <button onclick="doMove(10)">R</button>
-            <button onclick="doMove(11)" class="prime">R'</button>
-        </div>
-    </div>
+  <div class="panel-label">moves</div>
+  <div id="moves-grid">
+    <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button onclick="doMove(1)" class="prime">U'</button></div>
+    <div class="btn-pair"><span class="face-label">D</span><button onclick="doMove(2)">D</button><button onclick="doMove(3)" class="prime">D'</button></div>
+    <div class="btn-pair"><span class="face-label">F</span><button onclick="doMove(4)">F</button><button onclick="doMove(5)" class="prime">F'</button></div>
+    <div class="btn-pair"><span class="face-label">B</span><button onclick="doMove(6)">B</button><button onclick="doMove(7)" class="prime">B'</button></div>
+    <div class="btn-pair"><span class="face-label">L</span><button onclick="doMove(8)">L</button><button onclick="doMove(9)" class="prime">L'</button></div>
+    <div class="btn-pair"><span class="face-label">R</span><button onclick="doMove(10)">R</button><button onclick="doMove(11)" class="prime">R'</button></div>
+  </div>
 
-    <div id="action-row">
-        <button id="btn-reset" onclick="doReset()">↺ reset</button>
-        <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
-        <button id="btn-undo" onclick="doUndo()">↩ undo</button>
-        <button id="btn-redo" onclick="doRedo()">↪ redo</button>
-    </div>
+  <hr class="divider">
+
+  <div id="action-row">
+    <button id="btn-reset" onclick="doReset()">↺ reset</button>
+    <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
+    <button id="btn-undo" onclick="doUndo()">↩ undo</button>
+    <button id="btn-redo" onclick="doRedo()">↪ redo</button>
+  </div>
 </div>
 
 <script type="importmap">

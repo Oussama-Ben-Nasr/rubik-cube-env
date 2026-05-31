@@ -4,7 +4,7 @@ import { OrbitControls } from "https://unpkg.com/three@0.179.1/examples/jsm/cont
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
+const SIDEBAR_W = 220;
 const INDEX_COLORS = [
     0xffffff, // 0  U  white
     0x00cc44, // 1  F  green
@@ -157,15 +157,20 @@ window.reset = async () => {
 // Init
 // ---------------------------------------------------------------------------
 
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth - SIDEBAR_W, window.innerHeight);
+    camera.aspect = (window.innerWidth - SIDEBAR_W) / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x111111);
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(60, (window.innerWidth - SIDEBAR_W) / window.innerHeight, 0.1, 1000);
     camera.position.copy(INITIAL_CAMERA_POSITION);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth - SIDEBAR_W, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -195,12 +200,19 @@ renderer.domElement.addEventListener(
 
     renderLoop();
 }
-
+function getMouseNDC(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    return {
+        x: ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        y: -((event.clientY - rect.top) / rect.height) * 2 + 1,
+    };
+}
 async function onCubePointerDown(event) {
     if (animating) return;
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    const ndc = getMouseNDC(event);
+    mouse.x = ndc.x;
+    mouse.y = ndc.y;
 
     raycaster.setFromCamera(mouse, camera);
 
