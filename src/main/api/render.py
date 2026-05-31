@@ -102,12 +102,14 @@ def save_solve(payload: dict = Body(...)):
         cur.execute(
             """
             insert into solves (
+                nickname,
                 solve_time_ms,
                 moves
             )
-            values (%s, %s)
+            values (%s, %s, %s)
             """,
             (
+                payload.get("nickname"),
                 payload["solve_time_ms"],
                 payload["moves"],
             ),
@@ -130,10 +132,12 @@ def leaderboard():
         cur.execute(
             """
             select
+                nickname,
                 solve_time_ms,
                 moves,
                 created_at
             from solves
+            where id > 12
             order by solve_time_ms asc
             limit 20
             """
@@ -143,9 +147,10 @@ def leaderboard():
 
     return [
         {
-            "solve_time_ms": row[0],
-            "moves": row[1],
-            "created_at": row[2],
+            "nickname": row[0],
+            "solve_time_ms": row[1],
+            "moves": row[2],
+            "created_at": row[3],
         }
         for row in rows
     ]

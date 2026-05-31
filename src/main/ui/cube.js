@@ -55,7 +55,8 @@ let scene, camera, renderer, controls;
 let cubieGroup = new THREE.Group();
 let animating = false;
     document.body.classList.remove("animating");           // block input during animation
-
+let nickname =
+    localStorage.getItem("rubiks_nickname") || "";
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -85,7 +86,13 @@ const INVERSE_MOVE = {
 
 init();
 await loadAndRender();
-
+if (!nickname) {
+    nickname = prompt("Nickname for leaderboard?") || "anonymous";
+    localStorage.setItem(
+        "rubiks_nickname",
+        nickname
+    );
+}
 // ---------------------------------------------------------------------------
 // Public API (called from HTML buttons)
 // ---------------------------------------------------------------------------
@@ -121,6 +128,7 @@ window.move = async (actionId) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                nickname,
                 solve_time_ms: solveMs,
                 moves: status.real_moves_count,
             }),
@@ -608,10 +616,11 @@ async function refreshLeaderboard() {
                 const secs = Math.floor(
                     r.solve_time_ms / 1000
                 );
+                console.log(r);
 
                 return `
                     <div class="leaderboard-row">
-                        ${i + 1}. ${secs}s · ${r.moves}m
+                        ${i + 1}. ${r.nickname} - ${secs}s · ${r.moves}m
                     </div>
                 `;
             })
