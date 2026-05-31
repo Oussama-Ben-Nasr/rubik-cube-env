@@ -150,3 +150,54 @@ class RubikCube3D:
             }
             for c in self.cubies
         ]
+
+    def export_as_kociemba_string(self):
+        """
+        Translates the 26-piece 3D cubie structure into a 54-character Kociemba string.
+        Expected order of faces: Up -> Right -> Front -> Down -> Left -> Back.
+        Each face grid is collected from top-left to bottom-right relative to standard tracking viewpoints.
+        """
+        cubies = self.export()
+
+        color_map = {0: 'U', 1: 'F', 2: 'D', 3: 'L', 4: 'B', 5: 'R'}
+
+        face_definitions = {
+            'U': {
+                'filter_lambda': lambda c: c['y'] == 1,
+                'sort_key': lambda c: (c['z'], c['x'])
+            },
+            'R': {
+                'filter_lambda': lambda c: c['x'] == 1,
+                'sort_key': lambda c: (-c['y'], -c['z'])
+            },
+            'F': {
+                'filter_lambda': lambda c: c['z'] == 1,
+                'sort_key': lambda c: (-c['y'], c['x'])
+            },
+            'D': {
+                'filter_lambda': lambda c: c['y'] == -1,
+                'sort_key': lambda c: (-c['z'], c['x'])
+            },
+            'L': {
+                'filter_lambda': lambda c: c['x'] == -1,
+                'sort_key': lambda c: (-c['y'], c['z'])
+            },
+            'B': {
+                'filter_lambda': lambda c: c['z'] == -1,
+                'sort_key': lambda c: (-c['y'], -c['x'])
+            }
+        }
+        
+        kociemba_string = ""
+
+        for face_name in ['U', 'R', 'F', 'D', 'L', 'B']:
+            face_config = face_definitions[face_name]
+
+            face_cubies = [c for c in cubies if face_config['filter_lambda'](c)]
+
+            face_cubies.sort(key=face_config['sort_key'])
+
+            for cubie in face_cubies:
+                color_int = cubie['colors'][face_name]
+                kociemba_string += color_map[color_int]
+        return kociemba_string

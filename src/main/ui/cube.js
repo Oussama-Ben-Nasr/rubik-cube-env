@@ -268,3 +268,26 @@ async function loadAndRender() {
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
 }
+
+
+// Move counter (read by cube.js via window.incrementCount / window.resetCount)
+let _count = 0;
+const countEl = document.getElementById('count');
+
+window.incrementCount = () => { countEl.textContent = ++_count; };
+window.resetCount     = () => { _count = 0; countEl.textContent = 0; };
+
+// Scramble: 20 random moves
+window.doScramble = async () => {
+    if (document.body.classList.contains('animating')) return;
+    // for (let i = 0; i < 20; i++) {
+    //     await window.move(Math.floor(Math.random() * 12));
+    // }
+    await fetch(`/scramble`, { method: "POST" });
+    const state = await fetch("/cube").then(r => r.json());
+    renderCube(state);
+    window.resetCount();
+};
+
+window.doMove  = (a) => { window.move(a); window.incrementCount(); };
+window.doReset = () => { window.reset(); window.resetCount(); };
