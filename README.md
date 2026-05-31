@@ -1,10 +1,17 @@
 # 🧊 Rubik Cube Environment
 
-A 3D Rubik's Cube simulator with a FastAPI backend and interactive Three.js visualization — built to plug straight into reinforcement learning and search algorithms.
-
+A 3D Rubik's Cube simulator with a FastAPI backend and interactive Three.js visualization.
 ![Python](https://img.shields.io/badge/Python-3.14+-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-backend-green) ![Three.js](https://img.shields.io/badge/Three.js-3D-black) ![License](https://img.shields.io/badge/license-Apache%202.0-orange)
 
-## Quickstart
+## User guide
+The application is accessible via this link (cold started, via render service) 
+https://rubik-cube-service.render.com
+- Choose your nickname
+![](docs/nickname.png)
+- Start solving
+![2. Start solving](docs/game_play.png)
+
+## Contribute
 
 **1. Install [UV](https://astral.sh/uv)**
 
@@ -79,9 +86,25 @@ curl -X POST http://localhost:8000/reset
 
 ---
 
-## Roadmap
+## Supported features
+✅ Interactive 3D cube<br>✅ Mouse controls
+<br>✅ Undo / Redo
+<br>✅ Scramble / Competition mode
+<br>✅ Timer
+<br>✅ Move counter
+<br>✅ Solver endpoint (admin protected)
+<br>✅ Persistent leaderboard (Postgres)
+<br>✅ Nicknames
+<br>✅ Share results
+<br>✅ Multi-user isolation via cookies
+<br>✅ Public deployment
+<br>✅ Automatic deployment from Git
 
-- [ ] OpenAI Gym compatible interface
+## Roadmap
+☐ User accounts
+<br>
+☐ Multiplayer races
+
 
 ---
 
