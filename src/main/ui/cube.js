@@ -52,6 +52,29 @@ let cubieGroup = new THREE.Group();
 let animating = false;
     document.body.classList.remove("animating");           // block input during animation
 
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+const FACE_TO_MOVE = {
+    U: [0, 1],   // U, U'
+    D: [2, 3],   // D, D'
+    F: [4, 5],   // F, F'
+    B: [6, 7],   // B, B'
+    L: [8, 9],   // L, L'
+    R: [10, 11], // R, R'
+};
+const moveHistory = [];
+const redoHistory = [];
+
+const INVERSE_MOVE = {
+    0: 1,  1: 0,
+    2: 3,  3: 2,
+    4: 5,  5: 4,
+    6: 7,  7: 6,
+    8: 9,  9: 8,
+    10: 11, 11: 10,
+};
+
 // ---------------------------------------------------------------------------
 // Bootstrap
 // ---------------------------------------------------------------------------
@@ -117,6 +140,15 @@ function init() {
     scene.add(dir);
 
     scene.add(cubieGroup);
+    renderer.domElement.addEventListener(
+    "contextmenu",
+    (e) => e.preventDefault()
+);
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    onCubePointerDown
+);
 
     window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -125,6 +157,35 @@ function init() {
     });
 
     renderLoop();
+}
+
+async function onCubePointerDown(event) {
+    if (animating) return;
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersections = raycaster.intersectObjects(
+        cubieGroup.children,
+        true
+    );
+
+    if (!intersections.length) return;
+
+    const hit = intersections[0].object;
+
+    const faceName = hit.userData.faceName;
+
+    if (!faceName) return;
+
+    const isRightClick = event.button === 2;
+
+    const moveId =
+        FACE_TO_MOVE[faceName][isRightClick ? 1 : 0];
+
+    await window.doMove(moveId);
 }
 
 function renderLoop() {
@@ -151,12 +212,13 @@ function createBody() {
 }
 
 /** Colored sticker plane sitting on one face */
-function createSticker(color, position, rotation) {
+function createSticker(color, position, rotation, faceName) {
     const geo = new THREE.PlaneGeometry(STICKER_SIZE, STICKER_SIZE);
     const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.1 });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.copy(position);
     mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+    mesh.userData.faceName = faceName;
     return mesh;
 }
 
@@ -179,7 +241,14 @@ function createCubie({ x, y, z, colors }) {
 
     for (const { face, pos, rot } of FACE_DEFS) {
         if (colors[face] !== undefined) {
-            group.add(createSticker(INDEX_COLORS[colors[face]], pos, rot));
+            group.add(
+    createSticker(
+        INDEX_COLORS[colors[face]],
+        pos,
+        rot,
+        face
+    )
+);
         }
     }
 
@@ -267,6 +336,7 @@ function easeInOut(t) {
 async function loadAndRender() {
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
+    updateUndoRedoButtons();
 }
 
 
@@ -286,8 +356,69 @@ window.doScramble = async () => {
     await fetch(`/scramble`, { method: "POST" });
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
+    moveHistory.length = 0;
+redoHistory.length = 0;
+updateUndoRedoButtons();
     window.resetCount();
 };
 
-window.doMove  = (a) => { window.move(a); window.incrementCount(); };
-window.doReset = () => { window.reset(); window.resetCount(); };
+window.doMove = async (a) => {
+    await window.move(a);
+
+    moveHistory.push(a);
+    redoHistory.length = 0;
+
+    window.incrementCount();
+    updateUndoRedoButtons();
+};
+window.doReset = async () => {
+    await window.reset();
+
+    moveHistory.length = 0;
+    redoHistory.length = 0;
+
+    window.resetCount();
+    updateUndoRedoButtons();
+};
+
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById("undo-btn");
+    const redoBtn = document.getElementById("redo-btn");
+
+    if (undoBtn) undoBtn.disabled = moveHistory.length === 0;
+    if (redoBtn) redoBtn.disabled = redoHistory.length === 0;
+}
+
+window.doUndo = async () => {
+    if (animating) return;
+    if (moveHistory.length === 0) return;
+
+    const move = moveHistory.pop();
+    const inverse = INVERSE_MOVE[move];
+
+    redoHistory.push(move);
+
+    await window.move(inverse);
+
+    if (_count > 0) {
+        _count--;
+        countEl.textContent = _count;
+    }
+
+    updateUndoRedoButtons();
+};
+
+window.doRedo = async () => {
+    if (animating) return;
+    if (redoHistory.length === 0) return;
+
+    const move = redoHistory.pop();
+
+    moveHistory.push(move);
+
+    await window.move(move);
+
+    window.incrementCount();
+    updateUndoRedoButtons();
+};
