@@ -125,6 +125,7 @@ window.move = async (actionId) => {
                 moves: status.real_moves_count,
             }),
         });
+        await refreshLeaderboard();
 
     clearInterval(timerInterval);
     
@@ -425,6 +426,7 @@ async function loadAndRender() {
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
     updateUndoRedoButtons();
+    await refreshLeaderboard();
     requestAnimationFrame(() => {
         loadingOverlay?.classList.add("hidden");
     });
@@ -573,4 +575,33 @@ async function startCompetitionTimer() {
 
         document.getElementById('timer-display').textContent = `${hrs}:${mins}:${secs}`;
     }, 1000);
+}
+
+async function refreshLeaderboard() {
+    const rows = await fetch("/leaderboard")
+        .then(r => r.json());
+
+    const el = document.getElementById("leaderboard");
+
+    if (!rows.length) {
+        el.innerHTML = "";
+        return;
+    }
+
+    el.innerHTML =
+        `<div class="leaderboard-title">TOP TIMES</div>` +
+        rows
+            .slice(0, 5)
+            .map((r, i) => {
+                const secs = Math.floor(
+                    r.solve_time_ms / 1000
+                );
+
+                return `
+                    <div class="leaderboard-row">
+                        ${i + 1}. ${secs}s · ${r.moves}m
+                    </div>
+                `;
+            })
+            .join("");
 }
