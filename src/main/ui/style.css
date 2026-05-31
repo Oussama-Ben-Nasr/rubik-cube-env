@@ -161,3 +161,12 @@ body.animating button { pointer-events: none; opacity: 0.4; }
         transform: rotate(360deg);
     }
 }
+#share-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+#share-menu[hidden] {
+    display: none;
+}

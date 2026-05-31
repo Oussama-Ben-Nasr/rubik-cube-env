@@ -35,7 +35,14 @@
     <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
     <button id="btn-undo" onclick="doUndo()">↩ undo</button>
     <button id="btn-redo" onclick="doRedo()">↪ redo</button>
-  </div>
+    <button id="btn-share" onclick="shareResult()" disabled>📤 share</button>
+    <div id="share-menu" hidden>
+    <button onclick="shareTo('x')">X</button>
+    <button onclick="shareTo('linkedin')">LinkedIn</button>
+    <button onclick="shareTo('whatsapp')">WhatsApp</button>
+    <button onclick="shareTo('telegram')">Telegram</button>
+</div>
+</div>
 </div>
 
 <script type="importmap">

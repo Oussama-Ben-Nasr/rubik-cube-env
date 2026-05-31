@@ -121,6 +121,13 @@ window.move = async (actionId) => {
         const solveMs =
         new Date(status.solve_time) -
         new Date(status.start_time);
+        lastSolve = {
+            nickname,
+            solveMs,
+            moves: status.real_moves_count,
+        };
+        document.getElementById("btn-share").disabled = false;
+        document.getElementById("share-menu").disabled = false;
         
         await fetch("/solve", {
             method: "POST",
@@ -471,6 +478,8 @@ window.doScramble = async () => {
     renderCube(state);
     moveHistory.length = 0;
     redoHistory.length = 0;
+    document.getElementById("btn-share").disabled = true;
+    document.getElementById("share-menu").disabled = true;
     updateUndoRedoButtons();
     startCompetitionTimer();
     window.resetCount();
@@ -487,6 +496,8 @@ window.doMove = async (a) => {
 };
 window.doReset = async () => {
     await window.reset();
+    document.getElementById("btn-share").disabled = true;
+    document.getElementById("share-menu").disabled = true;
 
     moveHistory.length = 0;
     redoHistory.length = 0;
@@ -577,6 +588,7 @@ function animateCameraReset() {
 
 let timerInterval = null;
 let startTime = null;
+let lastSolve = null;
 
 async function startCompetitionTimer() {
 
@@ -626,3 +638,56 @@ async function refreshLeaderboard() {
             })
             .join("");
 }
+window.shareResult = () => {
+    const menu = document.getElementById("share-menu");
+
+    menu.hidden = !menu.hidden;
+};
+
+window.shareTo = (platform) => {
+    if (!lastSolve) return;
+
+    const secs = Math.round(
+        lastSolve.solveMs / 1000
+    );
+
+    const text = encodeURIComponent(
+        `🧩 ${lastSolve.nickname} solved the Rubik's Cube in ${secs}s using ${lastSolve.moves} moves. Can you beat me?`
+    );
+
+    const url = "https://rubik-cube-service.onrender.com"
+
+    let shareUrl = "";
+
+    switch (platform) {
+        case "x":
+            shareUrl =
+                `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+            break;
+
+        case "linkedin":
+            shareUrl =
+                `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+            break;
+
+        case "whatsapp":
+            shareUrl =
+                `https://wa.me/?text=${text}%20${url}`;
+            break;
+
+        case "telegram":
+            shareUrl =
+                `https://t.me/share/url?url=${url}&text=${text}`;
+            break;
+    }
+
+    if (shareUrl) {
+        window.open(
+            shareUrl,
+            "_blank",
+            "noopener,noreferrer"
+        );
+    }
+
+    document.getElementById("share-menu").hidden = true;
+};
