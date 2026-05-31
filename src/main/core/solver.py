@@ -38,14 +38,17 @@ def solution(cube: RubikCube3D):
 
     logger.info(f"Executing inverted physical pathway onto 3D engine: {executable_actions}")
 
+    ans = ""
     for move_code in executable_actions:
         if move_code in code_to_actions:
             action_id = code_to_actions[move_code]
-            solution += [f"Apply action: {action_id}, corresponding to thee move {move_code}."]
+            solution += [f"Apply action: {action_id}, corresponding to the move {move_code}."]
+            ans += f"|{move_code}>"
 
             
     return {
         "status": "solved",
         "raw_kociemba_notation": raw_moves,
-        "actions_to_be_executed": solution
+        "actions_to_be_executed": solution,
+        "answer": ans,
     }

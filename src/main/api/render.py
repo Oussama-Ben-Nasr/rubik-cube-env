@@ -11,7 +11,9 @@ from fastapi import Body
 from src.main.api.db import get_conn
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timezone
+from uuid import uuid4
+from fastapi import Request, Response
+from fastapi import Header
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(message)s")
@@ -19,9 +21,25 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-cube = RubikCube3D()
+cubes: dict[str, RubikCube3D] = {}
 historical_moves = deque()
 
+def get_cube(request: Request, response: Response) -> RubikCube3D:
+    session_id = request.cookies.get("session_id")
+
+    if not session_id:
+        session_id = str(uuid4())
+        response.set_cookie(
+            "session_id",
+            session_id,
+            max_age=60 * 60 * 24 * 30,
+            samesite="lax",
+        )
+
+    if session_id not in cubes:
+        cubes[session_id] = RubikCube3D()
+
+    return cubes[session_id]
 
 app.mount(
     "/static",
@@ -34,64 +52,118 @@ def home():
     logger.info("The root endpoint was successfully hit!")
     return FileResponse("src/main/ui/index.html")
 
-
 @app.post("/move/{action}")
-def move(action: int):
+def move(
+    action: int,
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     cube.apply_action(action)
     historical_moves.append(actions_to_codes[action])
+
     return {"status": "ok"}
 
 @app.post("/finished")
-def finished():
+def finished(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     cube._competing = False
+
     return {"status": "ok"}
 
 @app.post("/scramble")
-def scramble():
-    is_dev = os.environ.get("RUBIK_CUBE_DEV", "").lower() == "true"
+def scramble(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
+    is_dev = os.environ.get(
+        "RUBIK_CUBE_DEV",
+        ""
+    ).lower() == "true"
+
     if is_dev:
         cube.apply_action(0)
         cube.apply_action(0)
         cube.competitor_start()
         return {"status": "ok"}
-    
+
     scrambling_sequence = ""
+
     for _ in range(20):
         action = randint(0, 11)
         cube.apply_action(action)
         scrambling_sequence += f"{actions_to_codes[action]} "
+
     logger.info(scrambling_sequence)
+
     cube.competitor_start()
+
     return {"status": "ok"}
 
 @app.post("/solution")
-def solve_cube():
+def solve_cube(
+    request: Request,
+    response: Response,
+    x_admin_password: str | None = Header(None),
+):
+    if x_admin_password != os.environ.get("ADMIN_PASSWORD", ""):
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden"
+        )
+
+    cube = get_cube(request, response)
+
     try:
         return solution(cube)
 
     except Exception as e:
-        logger.error(f"Official solver pipeline exception crashed: {str(e)}")
-        raise HTTPException(
-            status_code=400, 
-            detail=f"Error evaluating cube layout matrix states: {str(e)}"
+        logger.error(
+            f"Official solver pipeline exception crashed: {str(e)}"
         )
 
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error evaluating cube layout matrix states: {str(e)}"
+        )
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     return FileResponse("src/main/ui/favicon.ico")
 
 @app.post("/reset")
-def reset():
+def reset(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     cube.reset()
+
     return {"status": "ok"}
 
-
 @app.get("/cube")
-def get_cube():
+def get_cube_state(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     return cube.export()
 
 @app.get("/cube-export")
-def get_cube():
+def cube_export(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     return cube.export_as_kociemba_string()
 
 @app.post("/solve")
@@ -119,8 +191,14 @@ def save_solve(payload: dict = Body(...)):
 
     return {"success": True}
 
+
 @app.get("/status")
-def status():
+def status(
+    request: Request,
+    response: Response,
+):
+    cube = get_cube(request, response)
+
     return cube.status()
 
 
