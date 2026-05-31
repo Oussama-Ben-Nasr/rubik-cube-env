@@ -115,12 +115,6 @@ wheels = [
 ]
 
 [[package]]
-name = "future"
-version = "0.16.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/00/2b/8d082ddfed935f3608cc61140df6dcbf0edea1bc3ab52fb6c29ae3e81e85/future-0.16.0.tar.gz", hash = "sha256:e39ced1ab767b5936646cedba8bcce582398233d6a627067d4c6a454c90cfedb", size = 824484, upload-time = "2016-10-27T20:07:22.128Z" }
-
-[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -241,18 +235,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/15/1f/dc6771a52592a4451be6effa200cbfc9cec61e4393d3033d81a9d307961d/librt-0.11.0-cp314-cp314t-win32.whl", hash = "sha256:2b481d846ac894c4e8403c5fd0e87c5d11d6499e404b474602508a224ff531c8", size = 103562, upload-time = "2026-05-10T18:17:03.99Z" },
     { url = "https://files.pythonhosted.org/packages/62/4a/7d1415567027286a75ba1093ec4aca11f073e0f559c530cf3e0a757ad55c/librt-0.11.0-cp314-cp314t-win_amd64.whl", hash = "sha256:28edb433edde181112a908c78907af28f964eabc15f4dd16c9d66c834302677c", size = 124327, upload-time = "2026-05-10T18:17:05.465Z" },
     { url = "https://files.pythonhosted.org/packages/ce/62/b40b382fa0c66fee1478073eb8db352a4a6beda4a1adccf1df911d8c289c/librt-0.11.0-cp314-cp314t-win_arm64.whl", hash = "sha256:dee008f20b542e3cd162ba338a7f9ec0f6d23d395f66fe8aeeec3c9d067ea253", size = 102572, upload-time = "2026-05-10T18:17:06.809Z" },
-]
-
-[[package]]
-name = "magiccube"
-version = "1.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b0/4e/3e467076dd9b087de57d738edbe410e15259589d6bfd16e20bdf1f0a2444/magiccube-1.2.0.tar.gz", hash = "sha256:9761a71b4e7edcd370866e6907c5b8e0a5510150dc41c3d99c07644b1d6b5eb9", size = 21490, upload-time = "2025-04-27T16:26:56.028Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/e1/09b31d2fcc0a6bce0a9531f5b9abf5c6b87594b3885157971b792de4da0e/magiccube-1.2.0-py3-none-any.whl", hash = "sha256:f6b114ae7ac413053be375afa43b9b022d93709af9c72806ad7b4ebdc90e3bc5", size = 18519, upload-time = "2025-04-27T16:26:54.341Z" },
 ]
 
 [[package]]
@@ -581,13 +563,10 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
-    { name = "magiccube" },
     { name = "numpy" },
     { name = "redis" },
-    { name = "rubik-solver" },
     { name = "rubiktwophase" },
     { name = "uvicorn", extra = ["standard"] },
-    { name = "zombie-imp" },
 ]
 
 [package.dev-dependencies]
@@ -599,13 +578,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi" },
-    { name = "magiccube", specifier = ">=1.2.0" },
     { name = "numpy" },
     { name = "redis" },
-    { name = "rubik-solver", specifier = ">=0.2.0" },
     { name = "rubiktwophase", specifier = ">=1.1.1" },
     { name = "uvicorn", extras = ["standard"] },
-    { name = "zombie-imp", specifier = ">=0.0.4" },
 ]
 
 [package.metadata.requires-dev]
@@ -613,15 +589,6 @@ dev = [
     { name = "mypy" },
     { name = "pytest" },
 ]
-
-[[package]]
-name = "rubik-solver"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "future" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/17/f8/c80afe8baf7375b3ffec7d0a1780bd0909509ff5c0a80846c702a798df7a/rubik_solver-0.2.0.tar.gz", hash = "sha256:b951e84cda8b36343b0e589833c1aa1a2771eae7bdb56279ec1e87870e7a7cf5", size = 3556243, upload-time = "2019-01-14T23:14:16.592Z" }
 
 [[package]]
 name = "rubiktwophase"
@@ -851,13 +818,4 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c2/b6/b9afed2afadddaf5ebb2afa801abf4b0868f42f8539bfe4b071b5266c9fe/websockets-16.0-cp314-cp314t-win32.whl", hash = "sha256:5a4b4cc550cb665dd8a47f868c8d04c8230f857363ad3c9caf7a0c3bf8c61ca6", size = 178085, upload-time = "2026-01-10T09:23:33.816Z" },
     { url = "https://files.pythonhosted.org/packages/9f/3e/28135a24e384493fa804216b79a6a6759a38cc4ff59118787b9fb693df93/websockets-16.0-cp314-cp314t-win_amd64.whl", hash = "sha256:b14dc141ed6d2dde437cddb216004bcac6a1df0935d79656387bd41632ba0bbd", size = 178531, upload-time = "2026-01-10T09:23:35.016Z" },
     { url = "https://files.pythonhosted.org/packages/6f/28/258ebab549c2bf3e64d2b0217b973467394a9cea8c42f70418ca2c5d0d2e/websockets-16.0-py3-none-any.whl", hash = "sha256:1637db62fad1dc833276dded54215f2c7fa46912301a24bd94d45d46a011ceec", size = 171598, upload-time = "2026-01-10T09:23:45.395Z" },
-]
-
-[[package]]
-name = "zombie-imp"
-version = "0.0.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/48/ac/0701001f59a7eee5630b094252ac3019df62110a71aa5282b14a7293ffd3/zombie_imp-0.0.4.tar.gz", hash = "sha256:c888321fbd942f1a3205c0923a2f21d3ed6e5ab6c2f6237abf43c147f37df97f", size = 18399, upload-time = "2025-12-22T13:20:43.896Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/43/8704451c1a8ad255aa27acf302243c9f2cc8e96953696d2968242cb5e235/zombie_imp-0.0.4-py3-none-any.whl", hash = "sha256:6ba08bf13602358c7c39561b939e97bba181c7c5f96ff1b2d707e0f43d9e05a7", size = 12198, upload-time = "2025-12-22T13:20:42.576Z" },
 ]

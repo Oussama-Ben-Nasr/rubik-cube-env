@@ -10,9 +10,6 @@ dependencies = [
     "uvicorn[standard]",
     "numpy",
     "redis",
-    "magiccube>=1.2.0",
-    "rubik-solver>=0.2.0",
-    "zombie-imp>=0.0.4",
     "rubiktwophase>=1.1.1",
 ]
 

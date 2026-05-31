@@ -41,7 +41,7 @@ uv run pytest src/test/ -v
 uv run uvicorn src.main.api.render:app --reload
 ```
 
-Open **http://localhost:8000** — that's it.
+Open **http://localhost:8000**
 
 ---
 
