@@ -42,6 +42,8 @@ const AXES = [
     new THREE.Vector3(0, 1, 0),
     new THREE.Vector3(0, 0, 1),
 ];
+const INITIAL_CAMERA_POSITION = new THREE.Vector3(6, 6, 6);
+const INITIAL_TARGET = new THREE.Vector3(0, 0, 0);
 
 // ---------------------------------------------------------------------------
 // Scene globals
@@ -114,6 +116,10 @@ window.reset = async () => {
     await fetch(`/reset`, { method: "POST" });
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
+    camera.position.copy(INITIAL_CAMERA_POSITION);
+
+    controls.target.copy(INITIAL_TARGET);
+    controls.update();
 };
 
 // ---------------------------------------------------------------------------
@@ -125,7 +131,7 @@ function init() {
     scene.background = new THREE.Color(0x111111);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(6, 6, 6);
+    camera.position.copy(INITIAL_CAMERA_POSITION);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
