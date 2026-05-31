@@ -48,7 +48,7 @@ def finished():
 
 @app.post("/scramble")
 def scramble():
-    is_dev = os.environ.get("DEV", "true").lower() == "true"
+    is_dev = os.environ.get("RUBIK_CUBE_DEV", "").lower() == "true"
     if is_dev:
         cube.apply_action(0)
         cube.apply_action(0)
