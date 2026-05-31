@@ -4,21 +4,6 @@ A 3D Rubik's Cube simulator with a FastAPI backend and interactive Three.js visu
 
 ![Python](https://img.shields.io/badge/Python-3.14+-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-backend-green) ![Three.js](https://img.shields.io/badge/Three.js-3D-black) ![License](https://img.shields.io/badge/license-Apache%202.0-orange)
 
----
-
-## What's inside
-
-```text
-src/
-├── main/
-│   ├── api/
-│   ├── core/
-│   └── ui/
-└── test/
-```
-
----
-
 ## Quickstart
 
 **1. Install [UV](https://astral.sh/uv)**
@@ -34,8 +19,6 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 **2. Clone & run**
 
 ```bash
-git clone <repository-url>
-cd rubik-cube-env
 uv sync
 uv run pytest src/test/ -v
 uv run uvicorn src.main.api.render:app --reload

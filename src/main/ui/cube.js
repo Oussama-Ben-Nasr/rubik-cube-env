@@ -18,6 +18,8 @@ const CUBIE_BODY_COLOR = 0x111111;   // near-black base
 const STICKER_OFFSET   = 0.501;     // just above the face surface
 const STICKER_SIZE     = 0.85;
 const ANIM_DURATION_MS = 280;
+const loadingOverlay =
+    document.getElementById("loading-overlay");
 
 // Action → { axis, layerValue, direction, angleDelta }
 // axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
@@ -116,10 +118,7 @@ window.reset = async () => {
     await fetch(`/reset`, { method: "POST" });
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
-    camera.position.copy(INITIAL_CAMERA_POSITION);
-
-    controls.target.copy(INITIAL_TARGET);
-    controls.update();
+    await animateCameraReset();
 };
 
 // ---------------------------------------------------------------------------
@@ -225,7 +224,40 @@ function createSticker(color, position, rotation, faceName) {
     mesh.position.copy(position);
     mesh.rotation.set(rotation.x, rotation.y, rotation.z);
     mesh.userData.faceName = faceName;
-    return mesh;
+
+// Add label only for center stickers
+if (faceName) {
+    const label = createFaceLabel(faceName);
+
+    // Only center stickers will actually use it
+    mesh.userData.label = label;
+}
+
+return mesh;
+}
+
+function createFaceLabel(text) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "black";
+    ctx.font = "bold 96px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 64, 64);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    return new THREE.Mesh(
+        new THREE.PlaneGeometry(0.45, 0.45),
+        new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+        })
+    );
 }
 
 function createCubie({ x, y, z, colors }) {
@@ -257,6 +289,25 @@ function createCubie({ x, y, z, colors }) {
 );
         }
     }
+
+const isCenter =
+    Math.abs(x) + Math.abs(y) + Math.abs(z) === 1;
+
+if (isCenter) {
+    for (const child of group.children) {
+        if (
+            child.userData?.faceName &&
+            child.userData?.label
+        ) {
+            const label = child.userData.label;
+
+            label.position.set(0, 0, 0.01);
+            label.rotation.set(0, 0, 0);
+
+            child.add(label);
+        }
+    }
+}
 
     return group;
 }
@@ -343,6 +394,9 @@ async function loadAndRender() {
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
     updateUndoRedoButtons();
+    requestAnimationFrame(() => {
+        loadingOverlay?.classList.add("hidden");
+    });
 }
 
 
@@ -428,3 +482,41 @@ window.doRedo = async () => {
     window.incrementCount();
     updateUndoRedoButtons();
 };
+
+function animateCameraReset() {
+    return new Promise(resolve => {
+        const startPos = camera.position.clone();
+        const startTarget = controls.target.clone();
+
+        const duration = 500;
+        const startTime = performance.now();
+
+        function tick() {
+            const elapsed = performance.now() - startTime;
+            const t = Math.min(elapsed / duration, 1);
+            const eased = easeInOut(t);
+
+            camera.position.lerpVectors(
+                startPos,
+                INITIAL_CAMERA_POSITION,
+                eased
+            );
+
+            controls.target.lerpVectors(
+                startTarget,
+                INITIAL_TARGET,
+                eased
+            );
+
+            controls.update();
+
+            if (t < 1) {
+                requestAnimationFrame(tick);
+            } else {
+                resolve();
+            }
+        }
+
+        requestAnimationFrame(tick);
+    });
+}
