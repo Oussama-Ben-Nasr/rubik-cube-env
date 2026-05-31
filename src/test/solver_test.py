@@ -61,7 +61,7 @@ class TestSolverFunctionBehavior:
         
         for text_line in generated_actions:
             assert text_line.startswith("Apply action:")
-            assert "corresponding to thee move" in text_line
+            assert "corresponding to the move" in text_line
 
 
 class TestSolverFunctionEdgeCases:

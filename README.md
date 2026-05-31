@@ -5,7 +5,7 @@ A 3D Rubik's Cube simulator with a FastAPI backend and interactive Three.js visu
 
 ## User guide
 The application is accessible via this link (cold started, via render service) 
-https://rubik-cube-service.render.com
+https://rubik-cube-service.onrender.com
 - Choose your nickname
 ![](docs/nickname.png)
 - Start solving
