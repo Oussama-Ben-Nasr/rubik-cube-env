@@ -28,6 +28,15 @@
       style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">ok</button>
   </div>
 </div>
+<div id="cannot-solve-modal"
+  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+  <div
+    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
+    <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">Cannot use auto solver while competing!</p>
+    <button id="cannot-solve-ok"
+      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">Got it</button>
+  </div>
+</div>
 <div id="nickname-modal"
   style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
   <div

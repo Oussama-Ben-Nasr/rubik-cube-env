@@ -36,6 +36,19 @@ function showSolvedModal() {
   ok.addEventListener('click', close);
 }
 
+function showForbidSolvedModal() {
+
+  const modal = document.getElementById('cannot-solve-modal');
+  modal.style.display = 'flex';
+
+  const ok = document.getElementById('cannot-solve-ok');
+  const close = () => {
+    modal.style.display = 'none';
+    ok.removeEventListener('click', close);
+  };
+  ok.addEventListener('click', close);
+}
+
 async function animateSolve() {
 
   if (isSolving) return;
@@ -44,7 +57,13 @@ async function animateSolve() {
   setControlsLocked(true);
 
   try {
-
+    const status = await fetch("/status").then(r => r.json());
+    if (status.is_competing) {
+      showForbidSolvedModal();
+      isSolving = false;
+      setControlsLocked(false);
+      return;
+    }
     const adminPassword = "my-suppa-duppa-password#aA";
 
     const res = await fetch("/solution", {
