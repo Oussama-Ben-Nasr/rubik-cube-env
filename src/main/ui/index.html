@@ -1,72 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rubik's Cube</title>
-<link rel="stylesheet" href="/static/style.css?v2">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rubik's Cube</title>
+  <link rel="stylesheet" href="/static/style.css?v3">
 </head>
-<div id="win-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-  <div style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
+<div id="win-modal"
+  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+  <div
+    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
     <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">PUZZLE SOLVED</p>
     <p id="win-message" style="color:#fff; font-family:monospace; font-size:18px; font-weight:500;"></p>
     <p id="win-sub" style="color:#555; font-family:monospace; font-size:11px; margin-top:-4px;"></p>
-    <button id="win-ok" style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">nice ✓</button>
+    <button id="win-ok"
+      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">nice
+      ✓</button>
   </div>
 </div>
-<div id="nickname-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-  <div style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:16px;">
+<div id="solved-modal"
+  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+  <div
+    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
+    <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">Puzzle is already solved!</p>
+    <button id="solved-ok"
+      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">ok</button>
+  </div>
+</div>
+<div id="nickname-modal"
+  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+  <div
+    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:16px;">
     <p style="color:#fff; font-family:monospace; font-size:13px; letter-spacing:0.05em;">ENTER NICKNAME</p>
-    <p style="color:#555; font-family:monospace; font-size:11px; margin-top:-8px;">Your name will appear on the leaderboard</p>
+    <p style="color:#555; font-family:monospace; font-size:11px; margin-top:-8px;">Your name will appear on the
+      leaderboard</p>
     <input id="nickname-input" type="text" maxlength="20" placeholder="e.g. speedcuber42"
       style="background:#111; border:0.5px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:monospace; font-size:14px; padding:10px 12px; outline:none; width:100%;" />
     <div style="display:flex; gap:8px;">
-      <button id="nickname-cancel" style="flex:1; padding:10px; background:#1e1e1e; border:0.5px solid rgba(255,255,255,0.09); border-radius:8px; color:#666; font-family:monospace; font-size:12px; cursor:pointer;">cancel</button>
-      <button id="nickname-ok" style="flex:2; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">confirm ↵</button>
+      <button id="nickname-cancel"
+        style="flex:1; padding:10px; background:#1e1e1e; border:0.5px solid rgba(255,255,255,0.09); border-radius:8px; color:#666; font-family:monospace; font-size:12px; cursor:pointer;">cancel</button>
+      <button id="nickname-ok"
+        style="flex:2; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">confirm
+        ↵</button>
     </div>
   </div>
 </div>
+
 <body>
-<div id="sidebar">
-  <span class="app-title">Rubik's cube</span>
-  <div id="timer-display">--:--:--</div>
-  <div id="move-counter">moves: <span id="count">-</span></div>
 
-  <hr class="divider">
+  <div id="stats-panel">
 
-  <div id="leaderboard"></div>
+    <span class="app-title">Rubik's cube</span>
 
-  <hr class="divider">
+    <hr class="divider">
 
-  <div class="panel-label">moves</div>
-  <div id="moves-grid">
-    <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button onclick="doMove(1)" class="prime">U'</button></div>
-    <div class="btn-pair"><span class="face-label">D</span><button onclick="doMove(2)">D</button><button onclick="doMove(3)" class="prime">D'</button></div>
-    <div class="btn-pair"><span class="face-label">F</span><button onclick="doMove(4)">F</button><button onclick="doMove(5)" class="prime">F'</button></div>
-    <div class="btn-pair"><span class="face-label">B</span><button onclick="doMove(6)">B</button><button onclick="doMove(7)" class="prime">B'</button></div>
-    <div class="btn-pair"><span class="face-label">L</span><button onclick="doMove(8)">L</button><button onclick="doMove(9)" class="prime">L'</button></div>
-    <div class="btn-pair"><span class="face-label">R</span><button onclick="doMove(10)">R</button><button onclick="doMove(11)" class="prime">R'</button></div>
+    <div id="leaderboard"></div>
   </div>
 
-  <hr class="divider">
+  <div id="controls-panel">
 
-  <div id="action-row">
-    <button id="btn-reset" onclick="doReset()">↺ reset</button>
+    <div class="panel-label">cube control</div>
+    <div id="moves-grid">
+      <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button
+          onclick="doMove(1)" class="prime">U'</button></div>
+      <div class="btn-pair"><span class="face-label">D</span><button onclick="doMove(2)">D</button><button
+          onclick="doMove(3)" class="prime">D'</button></div>
+      <div class="btn-pair"><span class="face-label">F</span><button onclick="doMove(4)">F</button><button
+          onclick="doMove(5)" class="prime">F'</button></div>
+      <div class="btn-pair"><span class="face-label">B</span><button onclick="doMove(6)">B</button><button
+          onclick="doMove(7)" class="prime">B'</button></div>
+      <div class="btn-pair"><span class="face-label">L</span><button onclick="doMove(8)">L</button><button
+          onclick="doMove(9)" class="prime">L'</button></div>
+      <div class="btn-pair"><span class="face-label">R</span><button onclick="doMove(10)">R</button><button
+          onclick="doMove(11)" class="prime">R'</button></div>
+    </div>
+
+    <hr class="divider">
+
+    <div id="action-row">
+      <button id="btn-reset" onclick="doReset()">↺ reset</button>
+      <button id="solve-btn">✨ Solve</button>
+      <button id="btn-undo" onclick="doUndo()">↩ undo</button>
+      <button id="btn-redo" onclick="doRedo()">↪ redo</button>
+    </div>
+  </div>
+  <div id="history-panel">
+
+    <div class="move-history">
+      <div class="move-history-header">
+        <span>Moves</span>
+        <span id="move-history-count">0</span>
+      </div>
+      <div id="move-history-list" class="move-history-list">
+        <span class="history-empty">No moves yet</span>
+      </div>
+    </div>
+  </div>
+  <div id="compete-panel">
+    <div id="nickname-tag" style="margin-top: auto;"></div>
+    <hr class="divider">
+    <div id="timer-display">--:--:--</div>
+    <div id="move-counter">moves: <span id="count">-</span></div>
     <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
-    <button id="btn-undo" onclick="doUndo()">↩ undo</button>
-    <button id="btn-redo" onclick="doRedo()">↪ redo</button>
     <button id="btn-share" onclick="shareResult()" disabled>📤 share</button>
     <div id="share-menu" hidden>
-    <button onclick="shareTo('x')">X</button>
-    <button onclick="shareTo('linkedin')">LinkedIn</button>
-    <button onclick="shareTo('whatsapp')">WhatsApp</button>
-    <button onclick="shareTo('telegram')">Telegram</button>
-</div>
-</div>
-<div id="nickname-tag" style="margin-top: auto; padding-top: 8px;"></div>
-</div>
+      <button onclick="shareTo('x')">X</button>
+      <button onclick="shareTo('linkedin')">LinkedIn</button>
+      <button onclick="shareTo('whatsapp')">WhatsApp</button>
+      <button onclick="shareTo('telegram')">Telegram</button>
+    </div>
 
-<script type="importmap">
+  </div>
+  <script type="importmap">
 {
   "imports": {
     "three": "https://unpkg.com/three@0.179.1/build/three.module.js"
@@ -74,6 +120,7 @@
 }
 </script>
 
-<script type="module" src="/static/cube.js"></script>
+  <script type="module" src="/static/cube.js?v3"></script>
 </body>
+
 </html>

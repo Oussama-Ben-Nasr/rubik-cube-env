@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/OrbitControls.js";
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js';
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
     0xffffff, // 0  U  white
@@ -14,9 +12,9 @@ const INDEX_COLORS = [
     0xee1111, // 5  R  red
 ];
 
-const CUBIE_BODY_COLOR = 0x111111;   // near-black base
-const STICKER_OFFSET   = 0.501;     // just above the face surface
-const STICKER_SIZE     = 0.85;
+const CUBIE_BODY_COLOR = 0x111111;
+const STICKER_OFFSET = 0.501;
+const STICKER_SIZE = 0.85;
 const ANIM_DURATION_MS = 280;
 const loadingOverlay =
     document.getElementById("loading-overlay");
@@ -25,18 +23,18 @@ const loadingOverlay =
 // axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
 // angleDelta: full rotation in radians (±π/2)
 const ACTION_META = [
-    { axis: 1, layer:  1, angle:  Math.PI / 2 },  //  0  U
-    { axis: 1, layer:  1, angle: -Math.PI / 2 },  //  1  U'
+    { axis: 1, layer: 1, angle: Math.PI / 2 },  //  0  U
+    { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  1  U'
     { axis: 1, layer: -1, angle: -Math.PI / 2 },  //  2  D
-    { axis: 1, layer: -1, angle:  Math.PI / 2 },  //  3  D'
-    { axis: 2, layer:  1, angle:  Math.PI / 2 },  //  4  F
-    { axis: 2, layer:  1, angle: -Math.PI / 2 },  //  5  F'
+    { axis: 1, layer: -1, angle: Math.PI / 2 },  //  3  D'
+    { axis: 2, layer: 1, angle: Math.PI / 2 },  //  4  F
+    { axis: 2, layer: 1, angle: -Math.PI / 2 },  //  5  F'
     { axis: 2, layer: -1, angle: -Math.PI / 2 },  //  6  B
-    { axis: 2, layer: -1, angle:  Math.PI / 2 },  //  7  B'
+    { axis: 2, layer: -1, angle: Math.PI / 2 },  //  7  B'
     { axis: 0, layer: -1, angle: -Math.PI / 2 },  //  8  L
-    { axis: 0, layer: -1, angle:  Math.PI / 2 },  //  9  L'
-    { axis: 0, layer:  1, angle:  Math.PI / 2 },  // 10  R
-    { axis: 0, layer:  1, angle: -Math.PI / 2 },  // 11  R'
+    { axis: 0, layer: -1, angle: Math.PI / 2 },  //  9  L'
+    { axis: 0, layer: 1, angle: Math.PI / 2 },  // 10  R
+    { axis: 0, layer: 1, angle: -Math.PI / 2 },  // 11  R'
 ];
 
 const AXES = [
@@ -47,14 +45,11 @@ const AXES = [
 const INITIAL_CAMERA_POSITION = new THREE.Vector3(6, 6, 6);
 const INITIAL_TARGET = new THREE.Vector3(0, 0, 0);
 
-// ---------------------------------------------------------------------------
-// Scene globals
-// ---------------------------------------------------------------------------
 
 let scene, camera, renderer, controls;
 let cubieGroup = new THREE.Group();
 let animating = false;
-    document.body.classList.remove("animating");           // block input during animation
+document.body.classList.remove("animating");
 let nickname =
     localStorage.getItem("rubiks_nickname") || "";
 const raycaster = new THREE.Raycaster();
@@ -72,25 +67,23 @@ const moveHistory = [];
 const redoHistory = [];
 
 const INVERSE_MOVE = {
-    0: 1,  1: 0,
-    2: 3,  3: 2,
-    4: 5,  5: 4,
-    6: 7,  7: 6,
-    8: 9,  9: 8,
+    0: 1, 1: 0,
+    2: 3, 3: 2,
+    4: 5, 5: 4,
+    6: 7, 7: 6,
+    8: 9, 9: 8,
     10: 11, 11: 10,
 };
 
-// ---------------------------------------------------------------------------
-// Bootstrap
-// ---------------------------------------------------------------------------
-
 init();
+initMoveHistory(moveHistory);
+initSolver();
 await loadAndRender();
 function askNickname() {
     return new Promise((resolve) => {
         const modal = document.getElementById('nickname-modal');
         const input = document.getElementById('nickname-input');
-        const ok    = document.getElementById('nickname-ok');
+        const ok = document.getElementById('nickname-ok');
         const cancel = document.getElementById('nickname-cancel');
 
         input.value = '';
@@ -104,9 +97,9 @@ function askNickname() {
             input.removeEventListener('keydown', onKey);
             resolve(val);
         };
-        const onOk     = () => finish(input.value.trim() || 'Anonymous');
+        const onOk = () => finish(input.value.trim() || 'Anonymous');
         const onCancel = () => finish(null);
-        const onKey    = (e) => { if (e.key === 'Enter') onOk(); if (e.key === 'Escape') onCancel(); };
+        const onKey = (e) => { if (e.key === 'Enter') onOk(); if (e.key === 'Escape') onCancel(); };
 
         ok.addEventListener('click', onOk);
         cancel.addEventListener('click', onCancel);
@@ -148,10 +141,7 @@ if (!nickname) {
         nickname
     );
 }
-if(nickname) showNicknameTag(nickname);
-// ---------------------------------------------------------------------------
-// Public API (called from HTML buttons)
-// ---------------------------------------------------------------------------
+if (nickname) showNicknameTag(nickname);
 
 window.move = async (actionId) => {
     if (animating) return;
@@ -162,21 +152,17 @@ window.move = async (actionId) => {
     animating = true;
     document.body.classList.add("animating");
 
-    // 1. Animate the layer visually
     await animateLayer(meta);
 
-    // 2. Commit the move on the server
     await fetch(`/move/${actionId}`, { method: "POST" });
 
-    // 3. Rebuild from ground-truth state
     const state = await fetch("/cube").then(r => r.json());
     const status = await fetch("/status").then(r => r.json());
-    
+
     if (status.is_competing && status.solved) {
-        console.log(status.solve_time, status.real_moves_count );
         const solveMs =
-        new Date(status.solve_time) -
-        new Date(status.start_time);
+            new Date(status.solve_time) -
+            new Date(status.start_time);
         lastSolve = {
             nickname,
             solveMs,
@@ -184,7 +170,7 @@ window.move = async (actionId) => {
         };
         document.getElementById("btn-share").disabled = false;
         document.getElementById("share-menu").disabled = false;
-        
+
         await fetch("/solve", {
             method: "POST",
             headers: {
@@ -198,13 +184,13 @@ window.move = async (actionId) => {
         });
         await refreshLeaderboard();
 
-    clearInterval(timerInterval);
-    
-    showWinModal(
-        Math.round(solveMs / 1000), status.real_moves_count
-    );
-    await fetch("finished", { method: "POST" });
-}
+        clearInterval(timerInterval);
+
+        showWinModal(
+            Math.round(solveMs / 1000), status.real_moves_count
+        );
+        await fetch("finished", { method: "POST" });
+    }
     renderCube(state);
 
     animating = false;
@@ -222,11 +208,11 @@ window.reset = async () => {
         if (timerInterval) clearInterval(timerInterval);
     }
     await animateCameraReset();
+    moveHistory.length = 0;
+    redoHistory.length = 0;
+    syncHistoryDisplay(moveHistory);
 };
 
-// ---------------------------------------------------------------------------
-// Init
-// ---------------------------------------------------------------------------
 
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth - SIDEBAR_W, window.innerHeight);
@@ -254,14 +240,14 @@ function init() {
 
     scene.add(cubieGroup);
     renderer.domElement.addEventListener(
-    "contextmenu",
-    (e) => e.preventDefault()
-);
+        "contextmenu",
+        (e) => e.preventDefault()
+    );
 
-renderer.domElement.addEventListener(
-    "pointerdown",
-    onCubePointerDown
-);
+    renderer.domElement.addEventListener(
+        "pointerdown",
+        onCubePointerDown
+    );
 
     window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -314,9 +300,6 @@ function renderLoop() {
     renderer.render(scene, camera);
 }
 
-// ---------------------------------------------------------------------------
-// Cube building
-// ---------------------------------------------------------------------------
 
 function clearScene() {
     scene.remove(cubieGroup);
@@ -324,14 +307,12 @@ function clearScene() {
     scene.add(cubieGroup);
 }
 
-/** Dark box body for a single cubie */
 function createBody() {
     const geo = new THREE.BoxGeometry(0.95, 0.95, 0.95);
     const mat = new THREE.MeshStandardMaterial({ color: CUBIE_BODY_COLOR, roughness: 0.8 });
     return new THREE.Mesh(geo, mat);
 }
 
-/** Colored sticker plane sitting on one face */
 function createSticker(color, position, rotation, faceName) {
     const geo = new THREE.PlaneGeometry(STICKER_SIZE, STICKER_SIZE);
     const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.1 });
@@ -340,15 +321,13 @@ function createSticker(color, position, rotation, faceName) {
     mesh.rotation.set(rotation.x, rotation.y, rotation.z);
     mesh.userData.faceName = faceName;
 
-// Add label only for center stickers
-if (faceName) {
-    const label = createFaceLabel(faceName);
+    if (faceName) {
+        const label = createFaceLabel(faceName);
 
-    // Only center stickers will actually use it
-    mesh.userData.label = label;
-}
+        mesh.userData.label = label;
+    }
 
-return mesh;
+    return mesh;
 }
 
 function createFaceLabel(text) {
@@ -379,50 +358,49 @@ function createCubie({ x, y, z, colors }) {
     const group = new THREE.Group();
     group.position.set(x, y, z);
 
-    // Dark body
     group.add(createBody());
 
     const o = STICKER_OFFSET;
     const FACE_DEFS = [
-        { face: "U", pos: new THREE.Vector3(0,  o, 0), rot: new THREE.Euler(-Math.PI/2, 0, 0) },
-        { face: "D", pos: new THREE.Vector3(0, -o, 0), rot: new THREE.Euler( Math.PI/2, 0, 0) },
-        { face: "F", pos: new THREE.Vector3(0, 0,  o), rot: new THREE.Euler(0, 0, 0) },
+        { face: "U", pos: new THREE.Vector3(0, o, 0), rot: new THREE.Euler(-Math.PI / 2, 0, 0) },
+        { face: "D", pos: new THREE.Vector3(0, -o, 0), rot: new THREE.Euler(Math.PI / 2, 0, 0) },
+        { face: "F", pos: new THREE.Vector3(0, 0, o), rot: new THREE.Euler(0, 0, 0) },
         { face: "B", pos: new THREE.Vector3(0, 0, -o), rot: new THREE.Euler(0, Math.PI, 0) },
-        { face: "L", pos: new THREE.Vector3(-o, 0, 0), rot: new THREE.Euler(0, -Math.PI/2, 0) },
-        { face: "R", pos: new THREE.Vector3( o, 0, 0), rot: new THREE.Euler(0,  Math.PI/2, 0) },
+        { face: "L", pos: new THREE.Vector3(-o, 0, 0), rot: new THREE.Euler(0, -Math.PI / 2, 0) },
+        { face: "R", pos: new THREE.Vector3(o, 0, 0), rot: new THREE.Euler(0, Math.PI / 2, 0) },
     ];
 
     for (const { face, pos, rot } of FACE_DEFS) {
         if (colors[face] !== undefined) {
             group.add(
-    createSticker(
-        INDEX_COLORS[colors[face]],
-        pos,
-        rot,
-        face
-    )
-);
+                createSticker(
+                    INDEX_COLORS[colors[face]],
+                    pos,
+                    rot,
+                    face
+                )
+            );
         }
     }
 
-const isCenter =
-    Math.abs(x) + Math.abs(y) + Math.abs(z) === 1;
+    const isCenter =
+        Math.abs(x) + Math.abs(y) + Math.abs(z) === 1;
 
-if (isCenter) {
-    for (const child of group.children) {
-        if (
-            child.userData?.faceName &&
-            child.userData?.label
-        ) {
-            const label = child.userData.label;
+    if (isCenter) {
+        for (const child of group.children) {
+            if (
+                child.userData?.faceName &&
+                child.userData?.label
+            ) {
+                const label = child.userData.label;
 
-            label.position.set(0, 0, 0.01);
-            label.rotation.set(0, 0, 0);
+                label.position.set(0, 0, 0.01);
+                label.rotation.set(0, 0, 0);
 
-            child.add(label);
+                child.add(label);
+            }
         }
     }
-}
 
     return group;
 }
@@ -434,30 +412,19 @@ function renderCube(state) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Layer animation
-// ---------------------------------------------------------------------------
 
-/**
- * Smoothly rotate the cubies in `meta.layer` along `meta.axis` by `meta.angle`.
- * Uses an eased tween over ANIM_DURATION_MS ms.
- */
 function animateLayer(meta) {
     return new Promise(resolve => {
-        const axisVec  = AXES[meta.axis];
-        const axisKey  = ["x", "y", "z"][meta.axis];
+        const axisVec = AXES[meta.axis];
+        const axisKey = ["x", "y", "z"][meta.axis];
 
-        // Collect cubies in this layer
         const layerMeshes = cubieGroup.children.filter(child => {
             return Math.round(child.position[axisKey]) === meta.layer;
         });
 
-        // Reparent them under a temporary pivot group
         const pivot = new THREE.Group();
         scene.add(pivot);
         for (const mesh of layerMeshes) {
-            // Convert world position → pivot-local (pivot is at origin so it's a no-op,
-            // but keeping it explicit for correctness)
             cubieGroup.remove(mesh);
             pivot.add(mesh);
         }
@@ -470,20 +437,15 @@ function animateLayer(meta) {
             const t = Math.min(elapsed / ANIM_DURATION_MS, 1);
             const eased = easeInOut(t);
 
-            // Set absolute rotation on the pivot each frame
             const currentAngle = totalAngle * eased;
             pivot.setRotationFromAxisAngle(axisVec, currentAngle);
 
             if (t < 1) {
                 requestAnimationFrame(tick);
             } else {
-                // Re-attach cubies back to the main group.
-                // The server will supply the true final state immediately after,
-                // so we just need to avoid a visual pop until that fetch resolves.
                 pivot.updateMatrixWorld();
                 for (const mesh of [...pivot.children]) {
                     pivot.remove(mesh);
-                    // Apply pivot's rotation into the mesh world transform
                     mesh.applyMatrix4(pivot.matrix);
                     cubieGroup.add(mesh);
                 }
@@ -496,14 +458,10 @@ function animateLayer(meta) {
     });
 }
 
-/** Smooth ease-in-out (cubic) */
 function easeInOut(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-// ---------------------------------------------------------------------------
-// Load initial state
-// ---------------------------------------------------------------------------
 
 async function loadAndRender() {
     const state = await fetch("/cube").then(r => r.json());
@@ -515,15 +473,12 @@ async function loadAndRender() {
     });
 }
 
-
-// Move counter (read by cube.js via window.incrementCount / window.resetCount)
 let _count = 0;
 const countEl = document.getElementById('count');
 
 window.incrementCount = () => { countEl.textContent = ++_count; };
-window.resetCount     = () => { _count = 0; countEl.textContent = 0; };
+window.resetCount = () => { _count = 0; countEl.textContent = 0; };
 
-// Scramble: 20 random moves
 window.doScramble = async () => {
     if (document.body.classList.contains('animating')) return;
     if (!nickname) {
@@ -533,11 +488,8 @@ window.doScramble = async () => {
             nickname
         );
     }
-    if(!nickname) return;
+    if (!nickname) return;
     showNicknameTag(nickname);
-    // for (let i = 0; i < 20; i++) {
-    //     await window.move(Math.floor(Math.random() * 12));
-    // }
     await fetch(`/scramble`, { method: "POST" });
     const state = await fetch("/cube").then(r => r.json());
     renderCube(state);
@@ -548,6 +500,7 @@ window.doScramble = async () => {
     updateUndoRedoButtons();
     startCompetitionTimer();
     window.resetCount();
+    syncHistoryDisplay(moveHistory);
 };
 
 window.doMove = async (a) => {
@@ -558,6 +511,7 @@ window.doMove = async (a) => {
 
     window.incrementCount();
     updateUndoRedoButtons();
+    syncHistoryDisplay(moveHistory);
 };
 window.doReset = async () => {
     await window.reset();
@@ -597,6 +551,7 @@ window.doUndo = async () => {
     }
 
     updateUndoRedoButtons();
+    syncHistoryDisplay(moveHistory);
 };
 
 window.doRedo = async () => {
@@ -611,6 +566,7 @@ window.doRedo = async () => {
 
     window.incrementCount();
     updateUndoRedoButtons();
+    syncHistoryDisplay(moveHistory);
 };
 
 function animateCameraReset() {
@@ -658,9 +614,9 @@ let lastSolve = null;
 async function startCompetitionTimer() {
 
     if (timerInterval) clearInterval(timerInterval);
-    
+
     startTime = Date.now();
-    
+
 
     timerInterval = setInterval(() => {
         const elapsedMs = Date.now() - startTime;
@@ -693,7 +649,7 @@ async function refreshLeaderboard() {
                 const secs = Math.floor(
                     r.solve_time_ms / 1000
                 );
-                console.log(r);
+                //console.log(r);
 
                 return `
                     <div class="leaderboard-row">

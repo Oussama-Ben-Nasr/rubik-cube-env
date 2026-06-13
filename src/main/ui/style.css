@@ -1,11 +1,19 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     display: flex;
     flex-direction: row;
     overflow: hidden;
     background: #111;
-    gap: 0;                 /* gap handled by sidebar margin */
+    gap: 0;
 }
+
 #nickname-tag {
     font-family: monospace;
     font-size: 11px;
@@ -14,26 +22,11 @@ body {
     pointer-events: none;
     user-select: none;
 }
+
 canvas {
-    flex: 1;          /* takes all remaining width */
-    position: static; /* no longer fixed */
+    flex: 1;
+    position: static;
     display: block;
-}
-#sidebar {
-    width: 220px;
-    min-width: 220px;
-    height: calc(100vh - 24px);   /* shorter than full height */
-    margin: 12px 0 12px 12px;     /* floats off all edges */
-    overflow-y: auto;
-    background: rgba(18, 18, 18, 0.92);
-    border: 0.5px solid rgba(255,255,255,0.08);
-    border-radius: 16px;           /* curved edges */
-    padding: 16px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 10;
-    /* remove border-right — full border now */
 }
 
 .app-title {
@@ -59,7 +52,7 @@ canvas {
 
 .divider {
     border: none;
-    border-top: 0.5px solid rgba(255,255,255,0.07);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.07);
     margin: 4px 0;
 }
 
@@ -70,7 +63,6 @@ canvas {
     text-transform: uppercase;
 }
 
-/* 3 columns instead of 6 — fits sidebar width */
 #moves-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -84,13 +76,16 @@ canvas {
     gap: 4px;
 }
 
-.face-label { font-size: 9px; color: #444; }
+.face-label {
+    font-size: 9px;
+    color: #444;
+}
 
 button {
     width: 100%;
     padding: 7px 0;
     background: #1e1e1e;
-    border: 0.5px solid rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255, 255, 255, 0.09);
     border-radius: 6px;
     color: #bbb;
     font-size: 13px;
@@ -99,10 +94,24 @@ button {
     transition: background 0.12s, color 0.12s;
 }
 
-button.prime { color: #666; font-size: 12px; }
-button:hover:not(:disabled) { background: #2a2a2a; color: #ddd; }
-button:active:not(:disabled) { transform: scale(0.96); }
-button:disabled { opacity: 0.35; cursor: not-allowed; }
+button.prime {
+    color: #666;
+    font-size: 12px;
+}
+
+button:hover:not(:disabled) {
+    background: #2a2a2a;
+    color: #ddd;
+}
+
+button:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
 
 #action-row {
     display: grid;
@@ -112,13 +121,19 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 #btn-scramble {
     background: #1a221a;
-    border-color: rgba(80,180,80,0.2);
+    border-color: rgba(80, 180, 80, 0.2);
     color: #5a9;
 }
 
-#btn-scramble:hover:not(:disabled) { background: #1e2a1e; color: #6bc; }
+#btn-scramble:hover:not(:disabled) {
+    background: #1e2a1e;
+    color: #6bc;
+}
 
-body.animating button { pointer-events: none; opacity: 0.4; }
+body.animating button {
+    pointer-events: none;
+    opacity: 0.4;
+}
 
 #leaderboard {
     font-size: 11px;
@@ -171,6 +186,7 @@ body.animating button { pointer-events: none; opacity: 0.4; }
         transform: rotate(360deg);
     }
 }
+
 #share-menu {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -179,4 +195,142 @@ body.animating button { pointer-events: none; opacity: 0.4; }
 
 #share-menu[hidden] {
     display: none;
+}
+
+.move-history {
+    padding-top: 12px;
+    text-align: center;
+}
+
+.move-history-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.move-history-list {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-wrap: wrap;
+    max-height: 80px;
+    scrollbar-width: none;
+}
+
+.move-history-list::-webkit-scrollbar {
+    display: none;
+}
+
+.history-badge {
+    font-size: 10px;
+    font-family: monospace;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    background: #1e1e1e;
+    color: #999;
+    border: 1px solid #333;
+    border-bottom: 2px solid #444;
+    line-height: 1.8;
+}
+
+.history-badge--solver {
+    color: #6fbf6f;
+    border-color: #2a4a2a;
+    border-bottom-color: #3a6a3a;
+}
+
+.history-badge--empty {
+    color: #7878cc;
+    border-color: #2a2a4a;
+    border-bottom-color: #3a3a6a;
+}
+
+.history-badge--manual {
+    color: #ccaa55;
+    border-color: #3a3020;
+    border-bottom-color: #4a4030;
+}
+
+#stats-panel {
+    width: 220px;
+    min-width: 220px;
+    height: calc(33vh);
+    margin: 12px 0 12px 12px;
+    overflow-y: auto;
+    background: rgba(18, 18, 18, 0.92);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+}
+
+#controls-panel {
+    width: 220px;
+    min-width: 220px;
+    height: calc(50vh);
+    margin: 12px 0 12px 12px;
+    overflow-y: auto;
+    background: rgba(18, 18, 18, 0.92);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+}
+
+#history-panel {
+    width: 220px;
+    min-width: 220px;
+    height: calc(50vh);
+    margin: 12px 0 12px 12px;
+    overflow-y: auto;
+    background: rgba(18, 18, 18, 0.92);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+#compete-panel {
+    width: 220px;
+    min-width: 220px;
+    height: calc(33vh);
+    margin: 12px 0 12px 12px;
+    overflow-y: auto;
+    background: rgba(18, 18, 18, 0.92);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    position: fixed;
+    top: 20px;
+    right: 20px;
 }
