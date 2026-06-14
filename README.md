@@ -28,7 +28,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ```bash
 uv sync
 uv run pytest src/test/ -v
-uv run uvicorn src.main.api.render:app --reload
+uv run uvicorn src.main.api.routes:app --reload
 ```
 
 Open **http://localhost:8000**
@@ -93,6 +93,7 @@ curl -X POST http://localhost:8000/reset
 <br>✅ Timer
 <br>✅ Move counter
 <br>✅ Solver endpoint (admin protected)
+<br>✅ Auto solve replay step by step (in non compete mode)
 <br>✅ Persistent leaderboard (Postgres)
 <br>✅ Nicknames
 <br>✅ Share results

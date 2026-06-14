@@ -23,6 +23,7 @@ app = FastAPI()
 
 cubes: dict[str, RubikCube3D] = {}
 historical_moves = deque()
+SOLVES_TABLE = "solves_dev" if os.getenv("RUBIK_CUBE_DEV", "").lower() == "true" else "solves"
 
 def get_cube(request: Request, response: Response) -> RubikCube3D:
     session_id = request.cookies.get("session_id")
@@ -172,8 +173,8 @@ def save_solve(payload: dict = Body(...)):
 
     with conn.cursor() as cur:
         cur.execute(
-            """
-            insert into solves (
+            f"""
+            insert into {SOLVES_TABLE} (
                 nickname,
                 solve_time_ms,
                 moves
@@ -201,27 +202,34 @@ def status(
 
     return cube.status()
 
+from datetime import datetime, timezone
+from typing import Literal
 
 @app.get("/leaderboard")
-def leaderboard():
+def leaderboard(period: Literal["today", "all"] = "all"):
     conn = get_conn()
 
+    date_filter = "and created_at >= current_date" if period == "today" else ""
+
     with conn.cursor() as cur:
-        cur.execute(
-            """
-            select
+        sql = f"""
+            select distinct on (nickname)
                 nickname,
                 solve_time_ms,
                 moves,
                 created_at
-            from solves
-            where id > 12
-            order by solve_time_ms asc
-            limit 20
+            from {SOLVES_TABLE}
+            where id > 0
+              {date_filter}
+            order by nickname, solve_time_ms asc
             """
+        cur.execute(
+            sql,
         )
-
         rows = cur.fetchall()
+
+    rows.sort(key=lambda r: r[1])
+    rows = rows[:20]
 
     return [
         {

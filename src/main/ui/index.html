@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rubik's Cube</title>
-  <link rel="stylesheet" href="/static/style.css?v3">
+  <link rel="stylesheet" href="/static/style.css?v4">
 </head>
 <div id="win-modal"
   style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
@@ -63,13 +63,29 @@
     <span class="app-title">Rubik's cube</span>
 
     <hr class="divider">
+    <div id="leaderboard-filters">
+  <button 
+    id="filter-all" 
+    class="filter-btn filter-btn--active" 
+    onclick="setLeaderboardFilter('all')">all time</button>
+  <button 
+    id="filter-today" 
+    class="filter-btn" 
+    onclick="setLeaderboardFilter('today')">today</button>
+</div>
+<div id="leaderboard"></div>
 
     <div id="leaderboard"></div>
   </div>
 
   <div id="controls-panel">
 
-    <div class="panel-label">cube control</div>
+    <div class="panel-label">cube control
+  <button id="theme-toggle" onclick="toggleTheme()" 
+    style="float:right; width:auto; padding:2px 8px; font-size:10px;">
+    ☀ light
+  </button>
+</div>
     <div id="moves-grid">
       <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button
           onclick="doMove(1)" class="prime">U'</button></div>
@@ -129,7 +145,7 @@
 }
 </script>
 
-  <script type="module" src="/static/cube.js?v3"></script>
+  <script type="module" src="/static/cube.js?v4"></script>
 </body>
 
 </html>

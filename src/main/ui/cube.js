@@ -12,6 +12,12 @@ const INDEX_COLORS = [
     0xee1111, // 5  R  red
 ];
 
+const DARK_BG = 0x0d1117;
+const LIGHT_BG = 0xf0ece4;
+
+// Change the function signature
+let currentLeaderboardFilter = 'all';
+
 const CUBIE_BODY_COLOR = 0x111111;
 const STICKER_OFFSET = 0.501;
 const STICKER_SIZE = 0.85;
@@ -78,6 +84,12 @@ const INVERSE_MOVE = {
 init();
 initMoveHistory(moveHistory);
 initSolver();
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+    document.body.classList.add('light');
+    scene.background = new THREE.Color(0xe8e8e8);
+    document.getElementById('theme-toggle').textContent = '🌙 dark';
+}
 await loadAndRender();
 function askNickname() {
     return new Promise((resolve) => {
@@ -221,7 +233,8 @@ window.addEventListener('resize', () => {
 });
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111111);
+    const savedTheme = localStorage.getItem('theme');
+    scene.background = new THREE.Color(savedTheme === 'light' ? LIGHT_BG : DARK_BG);
 
     camera = new THREE.PerspectiveCamera(60, (window.innerWidth - SIDEBAR_W) / window.innerHeight, 0.1, 1000);
     camera.position.copy(INITIAL_CAMERA_POSITION);
@@ -631,7 +644,7 @@ async function startCompetitionTimer() {
 }
 
 async function refreshLeaderboard() {
-    const rows = await fetch("/leaderboard")
+    const rows = await fetch(`/leaderboard?period=${currentLeaderboardFilter}`)
         .then(r => r.json());
 
     const el = document.getElementById("leaderboard");
@@ -711,4 +724,58 @@ window.shareTo = (platform) => {
     }
 
     document.getElementById("share-menu").hidden = true;
+};
+
+// ---------------------------------------------------------------------------
+// Keyboard shortcuts
+// U/D/F/B/L/R = normal move, Shift+key = prime (inverse)
+// ---------------------------------------------------------------------------
+const KEY_TO_MOVE = {
+    'u': 0, 'U': 1,
+    'd': 2, 'D': 3,
+    'f': 4, 'F': 5,
+    'b': 6, 'B': 7,
+    'l': 8, 'L': 9,
+    'r': 10, 'R': 11,
+};
+
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (animating) return;
+    if (document.getElementById('solve-btn').disabled) return;
+
+    const key = e.shiftKey
+        ? e.key.toUpperCase()   // Shift+U → 'U' → prime
+        : e.key.toLowerCase();  // u → normal
+
+    const moveId = KEY_TO_MOVE[key];
+    if (moveId === undefined) return;
+
+    e.preventDefault();
+    window.doMove(moveId);
+});
+
+window.toggleTheme = () => {
+    const isLight = document.body.classList.toggle('light');
+    scene.background = new THREE.Color(isLight ? LIGHT_BG : DARK_BG);
+    document.getElementById('theme-toggle').textContent =
+        isLight ? '🌙 dark' : '☀️ light';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+};
+
+
+
+
+window.setLeaderboardFilter = (period) => {
+    currentLeaderboardFilter = period;
+
+    // Update active button style
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('filter-btn--active');
+    });
+    document.getElementById(
+        period === 'today' ? 'filter-today' : 'filter-all'
+    ).classList.add('filter-btn--active');
+
+    refreshLeaderboard();
 };
