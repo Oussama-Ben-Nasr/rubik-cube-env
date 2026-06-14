@@ -128,22 +128,10 @@ function showNicknameTag(name) {
     tag.textContent = name;
 }
 
-function showWinModal(timeSeconds, moves) {
+function getWinMessage(timeSeconds, moves) {
     const mins = String(Math.floor(timeSeconds / 60)).padStart(2, '0');
     const secs = String(timeSeconds % 60).padStart(2, '0');
-
-    document.getElementById('win-message').textContent = `${mins}:${secs} · ${moves} moves`;
-    document.getElementById('win-sub').textContent = 'Saved to leaderboard';
-
-    const modal = document.getElementById('win-modal');
-    modal.style.display = 'flex';
-
-    const ok = document.getElementById('win-ok');
-    const close = () => {
-        modal.style.display = 'none';
-        ok.removeEventListener('click', close);
-    };
-    ok.addEventListener('click', close);
+    return `${mins}:${secs} · ${moves} moves\nSaved to leaderboard`;
 }
 
 if (!nickname) {
@@ -197,10 +185,7 @@ window.move = async (actionId) => {
         await refreshLeaderboard();
 
         clearInterval(timerInterval);
-
-        showWinModal(
-            Math.round(solveMs / 1000), status.real_moves_count
-        );
+        alert(getWinMessage(Math.round(solveMs / 1000), status.real_moves_count));
         await fetch("finished", { method: "POST" });
     }
     renderCube(state);
@@ -778,4 +763,23 @@ window.setLeaderboardFilter = (period) => {
     ).classList.add('filter-btn--active');
 
     refreshLeaderboard();
+};
+
+window.alert = (message) => {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('alert-modal');
+        const msgEl = document.getElementById('alert-modal-message');
+        const okBtn = document.getElementById('alert-modal-ok');
+
+        msgEl.textContent = message;
+        modal.style.display = 'flex';
+
+        const close = () => {
+            modal.style.display = 'none';
+            okBtn.removeEventListener('click', close);
+            resolve();
+        };
+
+        okBtn.addEventListener('click', close);
+    });
 };

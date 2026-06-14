@@ -23,32 +23,6 @@ function setControlsLocked(locked) {
   }
 }
 
-function showSolvedModal() {
-
-  const modal = document.getElementById('solved-modal');
-  modal.style.display = 'flex';
-
-  const ok = document.getElementById('solved-ok');
-  const close = () => {
-    modal.style.display = 'none';
-    ok.removeEventListener('click', close);
-  };
-  ok.addEventListener('click', close);
-}
-
-function showForbidSolvedModal() {
-
-  const modal = document.getElementById('cannot-solve-modal');
-  modal.style.display = 'flex';
-
-  const ok = document.getElementById('cannot-solve-ok');
-  const close = () => {
-    modal.style.display = 'none';
-    ok.removeEventListener('click', close);
-  };
-  ok.addEventListener('click', close);
-}
-
 async function animateSolve() {
 
   if (isSolving) return;
@@ -59,7 +33,7 @@ async function animateSolve() {
   try {
     const status = await fetch("/status").then(r => r.json());
     if (status.is_competing) {
-      showForbidSolvedModal();
+      alert("Cannot use auto solver while competing!");
       isSolving = false;
       setControlsLocked(false);
       return;
@@ -104,7 +78,7 @@ async function animateSolve() {
     if (moveIds.length === 0) {
 
       if (data.status === "solved") {
-        showSolvedModal();
+        alert("Puzzle is already solved!");
         return;
       }
 
@@ -197,10 +171,10 @@ export function syncHistoryDisplay(moves) {
 
 export function initMoveHistory(moveHistory) {
   const saved =
-      JSON.parse(
-          localStorage.getItem("moveHistory") || "[]"
-      );
-  
+    JSON.parse(
+      localStorage.getItem("moveHistory") || "[]"
+    );
+
   moveHistory.push(...saved);
   syncHistoryDisplay(moveHistory);
 }

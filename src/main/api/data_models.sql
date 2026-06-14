@@ -1,4 +1,4 @@
-create table solves (
+create table if not exists solves (
     id bigint generated always as identity primary key,
     solve_time_ms bigint not null,
     moves integer not null,
@@ -6,7 +6,7 @@ create table solves (
     nickname text
 );
 
-create table solves_dev (
+create table if not exists solves_dev (
     id bigint generated always as identity primary key,
     solve_time_ms bigint not null,
     moves integer not null,

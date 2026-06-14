@@ -1,25 +1,25 @@
-/* Default = dark (already is) */
 :root {
-    --bg:           #0d1117;
-    --panel-bg:     rgba(18, 18, 18, 0.92);
+    --bg: #0d1117;
+    --panel-bg: rgba(18, 18, 18, 0.92);
     --panel-border: rgba(255, 255, 255, 0.08);
-    --btn-bg:       #1e1e1e;
-    --btn-border:   rgba(255, 255, 255, 0.09);
-    --btn-color:    #bbb;
-    --text-dim:     #555;
-    --divider:      rgba(255, 255, 255, 0.07);
+    --btn-bg: #1e1e1e;
+    --btn-border: rgba(255, 255, 255, 0.09);
+    --btn-color: #bbb;
+    --text-dim: #555;
+    --divider: rgba(255, 255, 255, 0.07);
 }
 
 body.light {
-    --bg:           #f0ece4;
-    --panel-bg:     rgba(255, 255, 255, 0.95);
+    --bg: #f0ece4;
+    --panel-bg: rgba(255, 255, 255, 0.95);
     --panel-border: rgba(0, 0, 0, 0.1);
-    --btn-bg:       #e8e8e8;
-    --btn-border:   rgba(0, 0, 0, 0.12);
-    --btn-color:    #333;
-    --text-dim:     #999;
-    --divider:      rgba(0, 0, 0, 0.08);
+    --btn-bg: #e8e8e8;
+    --btn-border: rgba(0, 0, 0, 0.12);
+    --btn-color: #333;
+    --text-dim: #999;
+    --divider: rgba(0, 0, 0, 0.08);
 }
+
 *,
 *::before,
 *::after {
@@ -107,7 +107,9 @@ canvas {
 button {
     width: 100%;
     padding: 7px 0;
-background: var(--btn-bg); border-color: var(--btn-border); color: var(--btn-color);
+    background: var(--btn-bg);
+    border-color: var(--btn-border);
+    color: var(--btn-color);
     border: 0.5px solid rgba(255, 255, 255, 0.09);
     border-radius: 6px;
     font-size: 13px;
@@ -326,7 +328,7 @@ body.animating button {
     height: calc(50vh);
     margin: 12px 0 12px 12px;
     overflow-y: auto;
-     background: var(--panel-bg);
+    background: var(--panel-bg);
     border-color: var(--panel-border);
     border: 0.5px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
@@ -383,45 +385,46 @@ body.animating button {
     border-color: rgba(80, 180, 80, 0.3);
     color: #5a9;
 }
-/* ── CSS variables ── */
+
 :root {
-    --bg:           #111;
-    --panel-bg:     rgba(18, 18, 18, 0.92);
+    --bg: #111;
+    --panel-bg: rgba(18, 18, 18, 0.92);
     --panel-border: rgba(255, 255, 255, 0.08);
-    --btn-bg:       #1e1e1e;
-    --btn-border:   rgba(255, 255, 255, 0.09);
-    --btn-color:    #bbb;
-    --btn-hover:    #2a2a2a;
-    --text-main:    #ccc;
-    --text-dim:     #555;
-    --text-dimmer:  #444;
-    --divider:      rgba(255, 255, 255, 0.07);
-    --label-color:  #444;
-    --app-title:    #444;
-    --lb-title:     #444;
-    --lb-text:      #888;
+    --btn-bg: #1e1e1e;
+    --btn-border: rgba(255, 255, 255, 0.09);
+    --btn-color: #bbb;
+    --btn-hover: #2a2a2a;
+    --text-main: #ccc;
+    --text-dim: #555;
+    --text-dimmer: #444;
+    --divider: rgba(255, 255, 255, 0.07);
+    --label-color: #444;
+    --app-title: #444;
+    --lb-title: #444;
+    --lb-text: #888;
 }
 
 body.light {
-    --bg:           #d8d8d8;       /* darker than panels so cube pops */
-    --panel-bg:     rgba(245, 245, 245, 0.97);
+    --bg: #d8d8d8;
+    --panel-bg: rgba(245, 245, 245, 0.97);
     --panel-border: rgba(0, 0, 0, 0.08);
-    --btn-bg:       #e2e2e2;
-    --btn-border:   rgba(0, 0, 0, 0.1);
-    --btn-color:    #333;
-    --btn-hover:    #d0d0d0;
-    --text-main:    #222;
-    --text-dim:     #777;
-    --text-dimmer:  #999;
-    --divider:      rgba(0, 0, 0, 0.08);
-    --label-color:  #666;
-    --app-title:    #666;
-    --lb-title:     #666;
-    --lb-text:      #444;
+    --btn-bg: #e2e2e2;
+    --btn-border: rgba(0, 0, 0, 0.1);
+    --btn-color: #333;
+    --btn-hover: #d0d0d0;
+    --text-main: #222;
+    --text-dim: #777;
+    --text-dimmer: #999;
+    --divider: rgba(0, 0, 0, 0.08);
+    --label-color: #666;
+    --app-title: #666;
+    --lb-title: #666;
+    --lb-text: #444;
 }
 
-/* ── Apply variables throughout ── */
-body { background: var(--bg); }
+body {
+    background: var(--bg);
+}
 
 #stats-panel,
 #controls-panel,
@@ -431,38 +434,61 @@ body { background: var(--bg); }
     border-color: var(--panel-border);
 }
 
-.app-title    { color: var(--app-title); }
-.panel-label  { color: var(--label-color); }
-.divider      { border-top-color: var(--divider); }
+.app-title {
+    color: var(--app-title);
+}
 
-/* leaderboard text */
-#leaderboard  { color: var(--lb-text); }
+.panel-label {
+    color: var(--label-color);
+}
+
+.divider {
+    border-top-color: var(--divider);
+}
+
+#leaderboard {
+    color: var(--lb-text);
+}
 
 button {
     background: var(--btn-bg);
     border-color: var(--btn-border);
     color: var(--btn-color);
 }
+
 button:hover:not(:disabled) {
     background: var(--btn-hover);
     color: var(--text-main);
 }
 
-/* filter buttons */
-.filter-btn { color: var(--text-dim); border-color: var(--panel-border); background: transparent; }
-.filter-btn--active { background: #1e2a1e; border-color: rgba(80,180,80,0.3); color: #5a9; }
+.filter-btn {
+    color: var(--text-dim);
+    border-color: var(--panel-border);
+    background: transparent;
+}
 
-/* timer */
-#timer-display { color: var(--text-main); }
-#move-counter  { color: var(--text-dim); }
+.filter-btn--active {
+    background: #1e2a1e;
+    border-color: rgba(80, 180, 80, 0.3);
+    color: #5a9;
+}
 
-/* nickname */
-#nickname-tag  { color: var(--text-dim); }
+#timer-display {
+    color: var(--text-main);
+}
 
-/* move history panel */
-.move-history-header { color: var(--text-dim); }
+#move-counter {
+    color: var(--text-dim);
+}
 
-/* fix "No moves yet" badge in light mode */
+#nickname-tag {
+    color: var(--text-dim);
+}
+
+.move-history-header {
+    color: var(--text-dim);
+}
+
 .history-badge--empty {
     background: #e8e8e8;
     color: #888;
@@ -482,4 +508,74 @@ body.light .history-badge--solver {
     color: #3a8a3a;
     border-color: #aadaaa;
     border-bottom-color: #8aba8a;
+}
+
+.modal-box {
+    background: var(--panel-bg);
+    border: 0.5px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-label {
+    color: #5a9;
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.modal-message {
+    color: var(--text-main);
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-btn {
+    margin-top: 8px;
+    padding: 10px;
+    background: #1a2a1a;
+    border: 0.5px solid rgba(80, 180, 80, 0.3);
+    border-radius: 8px;
+    color: #5a9;
+    font-family: monospace;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.modal-btn:hover {
+    background: #1e2e1e;
+    color: #6bc;
+}
+
+.modal-btn--cancel {
+    background: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.09);
+    color: #666;
+}
+
+.modal-btn--cancel:hover {
+    background: #2a2a2a;
+    color: #999;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.visible {
+    display: flex;
 }

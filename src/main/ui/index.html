@@ -7,34 +7,13 @@
   <title>Rubik's Cube</title>
   <link rel="stylesheet" href="/static/style.css?v4">
 </head>
-<div id="win-modal"
-  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-  <div
-    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
-    <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">PUZZLE SOLVED</p>
-    <p id="win-message" style="color:#fff; font-family:monospace; font-size:18px; font-weight:500;"></p>
-    <p id="win-sub" style="color:#555; font-family:monospace; font-size:11px; margin-top:-4px;"></p>
-    <button id="win-ok"
-      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">nice
-      ✓</button>
-  </div>
-</div>
-<div id="solved-modal"
-  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-  <div
-    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
-    <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">Puzzle is already solved!</p>
-    <button id="solved-ok"
-      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">ok</button>
-  </div>
-</div>
-<div id="cannot-solve-modal"
-  style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-  <div
-    style="background:#1a1a1a; border:0.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 24px; width:320px; display:flex; flex-direction:column; gap:12px;">
-    <p style="color:#5a9; font-family:monospace; font-size:10px; letter-spacing:0.15em;">Cannot use auto solver while competing!</p>
-    <button id="cannot-solve-ok"
-      style="margin-top:8px; padding:10px; background:#1a2a1a; border:0.5px solid rgba(80,180,80,0.3); border-radius:8px; color:#5a9; font-family:monospace; font-size:12px; cursor:pointer;">Got it</button>
+<div id="alert-modal" style="display:none; position:fixed; inset:0; z-index:1000; 
+     background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); 
+     align-items:center; justify-content:center;">
+  <div class="modal-box">
+    <p class="modal-label">notice</p>
+    <p id="alert-modal-message" class="modal-message"></p>
+    <button id="alert-modal-ok" class="modal-btn">ok</button>
   </div>
 </div>
 <div id="nickname-modal"
@@ -64,16 +43,11 @@
 
     <hr class="divider">
     <div id="leaderboard-filters">
-  <button 
-    id="filter-all" 
-    class="filter-btn filter-btn--active" 
-    onclick="setLeaderboardFilter('all')">all time</button>
-  <button 
-    id="filter-today" 
-    class="filter-btn" 
-    onclick="setLeaderboardFilter('today')">today</button>
-</div>
-<div id="leaderboard"></div>
+      <button id="filter-all" class="filter-btn filter-btn--active" onclick="setLeaderboardFilter('all')">all
+        time</button>
+      <button id="filter-today" class="filter-btn" onclick="setLeaderboardFilter('today')">today</button>
+    </div>
+    <div id="leaderboard"></div>
 
     <div id="leaderboard"></div>
   </div>
@@ -81,11 +55,11 @@
   <div id="controls-panel">
 
     <div class="panel-label">cube control
-  <button id="theme-toggle" onclick="toggleTheme()" 
-    style="float:right; width:auto; padding:2px 8px; font-size:10px;">
-    ☀ light
-  </button>
-</div>
+      <button id="theme-toggle" onclick="toggleTheme()"
+        style="float:right; width:auto; padding:2px 8px; font-size:10px;">
+        ☀ light
+      </button>
+    </div>
     <div id="moves-grid">
       <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button
           onclick="doMove(1)" class="prime">U'</button></div>
