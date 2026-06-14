@@ -3,6 +3,25 @@ const SOLVE_STEP_DELAY_MS = 400;
 let isSolving = false;
 
 
+window.alert = (message) => {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('alert-modal');
+    const msgEl = document.getElementById('alert-modal-message');
+    const okBtn = document.getElementById('alert-modal-ok');
+
+    msgEl.textContent = message;
+    modal.classList.add('visible');
+
+    const close = () => {
+      modal.classList.remove('visible');
+      okBtn.removeEventListener('click', close);
+      resolve();
+    };
+
+    okBtn.addEventListener('click', close);
+  });
+};
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

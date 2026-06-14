@@ -5,11 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rubik's Cube</title>
-  <link rel="stylesheet" href="/static/style.css?v4">
+  <link rel="stylesheet" href="/static/style.css?v5">
 </head>
-<div id="alert-modal" style="display:none; position:fixed; inset:0; z-index:1000; 
-     background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); 
-     align-items:center; justify-content:center;">
+<div id="alert-modal" class="modal-overlay">
   <div class="modal-box">
     <p class="modal-label">notice</p>
     <p id="alert-modal-message" class="modal-message"></p>
@@ -117,23 +115,22 @@
     </div>
   </div>
   <div id="compete-panel">
-    <div id="nickname-tag""></div>
-    <hr class=" divider">
-      <div id="timer-display">--:--:--</div>
-      <div id="move-counter">moves: <span id="count">-</span></div>
-      <hr class="divider">
-      <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
+    <div id="nickname-tag"></div>
+    <hr class="divider">
+    <div id="timer-display">--:--:--</div>
+    <div id="move-counter">moves: <span id="count">-</span></div>
+    <hr class="divider">
+    <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
 
-    </div>
-    <script type="importmap">
+  </div>
+  <script type="importmap">
 {
   "imports": {
     "three": "https://unpkg.com/three@0.179.1/build/three.module.js"
   }
 }
 </script>
-
-    <script type="module" src="/static/cube.js?v4"></script>
+  <script type="module" src="/static/cube.js?v5"></script>
 </body>
 
 </html>
