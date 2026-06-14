@@ -39,7 +39,6 @@ body {
 #nickname-tag {
     font-family: monospace;
     font-size: 11px;
-    color: #444;
     letter-spacing: 0.08em;
     pointer-events: none;
     user-select: none;

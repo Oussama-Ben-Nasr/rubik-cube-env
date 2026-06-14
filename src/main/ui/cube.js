@@ -185,7 +185,14 @@ window.move = async (actionId) => {
         await refreshLeaderboard();
 
         clearInterval(timerInterval);
-        alert(getWinMessage(Math.round(solveMs / 1000), status.real_moves_count));
+        const modal = document.getElementById('win-modal');
+        document.getElementById('win-message').textContent =
+            getWinMessage(Math.round(solveMs / 1000), status.real_moves_count);
+        document.getElementById('btn-share').disabled = false;
+        modal.classList.add('visible');
+        const winOk = document.getElementById('win-ok');
+        const closeWin = () => { modal.classList.remove('visible'); winOk.removeEventListener('click', closeWin); };
+        winOk.addEventListener('click', closeWin);
         await fetch("finished", { method: "POST" });
     }
     renderCube(state);
@@ -772,10 +779,10 @@ window.alert = (message) => {
         const okBtn = document.getElementById('alert-modal-ok');
 
         msgEl.textContent = message;
-        modal.style.display = 'flex';
+        modal.classList.add('visible');
 
         const close = () => {
-            modal.style.display = 'none';
+            modal.classList.remove('visible');
             okBtn.removeEventListener('click', close);
             resolve();
         };

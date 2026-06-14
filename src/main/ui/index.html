@@ -16,6 +16,26 @@
     <button id="alert-modal-ok" class="modal-btn">ok</button>
   </div>
 </div>
+<div id="win-modal" class="modal-overlay">
+  <div class="modal-box">
+    <p class="modal-label">PUZZLE SOLVED</p>
+    <p id="win-message" class="modal-message"></p>
+    <p id="win-sub" style="color:#555; font-family:monospace; font-size:11px; margin-top:-4px;"></p>
+    <button id="win-ok" class="modal-btn">nice ✓</button>
+
+    <div id="share-menu" hidden>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
+        <button class="modal-btn modal-btn--cancel" onclick="shareTo('x')">X</button>
+        <button class="modal-btn modal-btn--cancel" onclick="shareTo('linkedin')">LinkedIn</button>
+        <button class="modal-btn modal-btn--cancel" onclick="shareTo('whatsapp')">WhatsApp</button>
+        <button class="modal-btn modal-btn--cancel" onclick="shareTo('telegram')">Telegram</button>
+      </div>
+    </div>
+    <button id="btn-share" onclick="shareResult()" class="modal-btn modal-btn--cancel" disabled>
+      🔗 share result
+    </button>
+  </div>
+</div>
 <div id="nickname-modal"
   style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
   <div
@@ -97,21 +117,15 @@
     </div>
   </div>
   <div id="compete-panel">
-    <div id="nickname-tag" style="margin-top: auto;"></div>
-    <hr class="divider">
-    <div id="timer-display">--:--:--</div>
-    <div id="move-counter">moves: <span id="count">-</span></div>
-    <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
-    <button id="btn-share" onclick="shareResult()" disabled>📤 share</button>
-    <div id="share-menu" hidden>
-      <button onclick="shareTo('x')">X</button>
-      <button onclick="shareTo('linkedin')">LinkedIn</button>
-      <button onclick="shareTo('whatsapp')">WhatsApp</button>
-      <button onclick="shareTo('telegram')">Telegram</button>
-    </div>
+    <div id="nickname-tag""></div>
+    <hr class=" divider">
+      <div id="timer-display">--:--:--</div>
+      <div id="move-counter">moves: <span id="count">-</span></div>
+      <hr class="divider">
+      <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
 
-  </div>
-  <script type="importmap">
+    </div>
+    <script type="importmap">
 {
   "imports": {
     "three": "https://unpkg.com/three@0.179.1/build/three.module.js"
@@ -119,7 +133,7 @@
 }
 </script>
 
-  <script type="module" src="/static/cube.js?v4"></script>
+    <script type="module" src="/static/cube.js?v4"></script>
 </body>
 
 </html>
