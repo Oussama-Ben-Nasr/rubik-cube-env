@@ -28,18 +28,18 @@ const loadingOverlay =
 // axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
 // angleDelta: full rotation in radians (±π/2)
 const ACTION_META = [
-    { axis: 1, layer: 1, angle: Math.PI / 2 },  //  0  U
-    { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  1  U'
-    { axis: 1, layer: -1, angle: -Math.PI / 2 },  //  2  D
-    { axis: 1, layer: -1, angle: Math.PI / 2 },  //  3  D'
-    { axis: 2, layer: 1, angle: Math.PI / 2 },  //  4  F
-    { axis: 2, layer: 1, angle: -Math.PI / 2 },  //  5  F'
-    { axis: 2, layer: -1, angle: -Math.PI / 2 },  //  6  B
-    { axis: 2, layer: -1, angle: Math.PI / 2 },  //  7  B'
-    { axis: 0, layer: -1, angle: -Math.PI / 2 },  //  8  L
-    { axis: 0, layer: -1, angle: Math.PI / 2 },  //  9  L'
-    { axis: 0, layer: 1, angle: Math.PI / 2 },  // 10  R
-    { axis: 0, layer: 1, angle: -Math.PI / 2 },  // 11  R'
+    { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  0  U
+    { axis: 1, layer: 1, angle: Math.PI / 2 },  //  1  U'
+    { axis: 1, layer: -1, angle: Math.PI / 2 },  //  2  D
+    { axis: 1, layer: -1, angle: -Math.PI / 2 },  //  3  D'
+    { axis: 2, layer: 1, angle: -Math.PI / 2 },  //  4  F
+    { axis: 2, layer: 1, angle: Math.PI / 2 },  //  5  F'
+    { axis: 2, layer: -1, angle: Math.PI / 2 },  //  6  B
+    { axis: 2, layer: -1, angle: -Math.PI / 2 },  //  7  B'
+    { axis: 0, layer: -1, angle: Math.PI / 2 },  //  8  L
+    { axis: 0, layer: -1, angle: -Math.PI / 2 },  //  9  L'
+    { axis: 0, layer: 1, angle: -Math.PI / 2 },  // 10  R
+    { axis: 0, layer: 1, angle: Math.PI / 2 },  // 11  R'
 ];
 
 const AXES = [
@@ -55,8 +55,7 @@ let scene, camera, renderer, controls;
 let cubieGroup = new THREE.Group();
 let animating = false;
 document.body.classList.remove("animating");
-let nickname =
-    localStorage.getItem("rubiks_nickname") || "";
+let nickname = localStorage.getItem("rubiks_nickname") || "";
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
