@@ -780,3 +780,206 @@ body.light .history-badge--solver {
     cursor: not-allowed;
     pointer-events: none;
 }
+
+ 
+/* Snapshot nodes unclickable during compete mode */
+body.competing .snapshot-node {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+ 
+/* ==========================================================================
+   Slim vertical side panel — replaces all individual fixed positioning (v11)
+   ========================================================================== */
+ 
+/* Remove old standalone positioning for these elements */
+#camera-home-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-controls {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-tree {
+    position: static;
+    top: unset;
+    right: unset;
+    max-height: unset;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+}
+ 
+/* The unified panel */
+#floating-side-panel {
+    position: fixed;
+    top: 50%;
+    right: 340px;          /* left of the timer/history panel */
+    transform: translateY(-50%);
+    z-index: 1000;
+ 
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+ 
+    width: 54px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 27px;
+    padding: 8px 0;
+    gap: 0;
+ 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;      /* keeps children clipped to the pill shape */
+    transition: width 0.25s ease;
+}
+ 
+/* When the snapshot tree is open the panel widens to show labels */
+#floating-side-panel.expanded {
+    width: 220px;
+    border-radius: 14px;
+}
+ 
+/* Both icon buttons share the same style inside the panel */
+#floating-side-panel .side-btn {
+    width: 100%;
+    height: 54px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: #66d9c0;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+ 
+#floating-side-panel .side-btn:hover {
+    background: rgba(255,255,255,0.05);
+}
+ 
+#floating-side-panel .side-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+ 
+#snapshot-btn {
+    color: #a88be8;
+}
+ 
+/* Thin divider between the two buttons */
+.side-panel-divider {
+    height: 1px;
+    background: var(--panel-border);
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+ 
+/* Snapshot tree lives inside the panel, below the buttons */
+#snapshot-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding: 0 8px;
+}
+ 
+#snapshot-tree:not([hidden]) {
+    max-height: 500px;
+    padding: 8px 8px;
+    border-top: 1px solid var(--panel-border);
+}
+ 
+#snapshot-create-btn {
+    width: 100%;
+    padding: 7px 0;
+    background: rgba(168,139,232,0.1);
+    border: 1px solid rgba(168,139,232,0.25);
+    border-radius: 6px;
+    color: #a88be8;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    cursor: pointer;
+    transition: background 0.12s;
+    flex-shrink: 0;
+}
+ 
+#snapshot-create-btn:hover  { background: rgba(168,139,232,0.18); }
+#snapshot-create-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+ 
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+.snapshot-list::-webkit-scrollbar       { width: 3px; }
+.snapshot-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+ 
+body.competing .snapshot-node {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Tooltip on hover for slim mode */
+#floating-side-panel .side-btn {
+    position: relative;
+}
+ 
+#floating-side-panel .side-btn::after {
+    content: attr(data-label);
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #aaa;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+ 
+#floating-side-panel:not(.expanded) .side-btn:hover::after {
+    opacity: 1;
+}
+ 
+/* Color coding for action buttons */
+.side-btn.btn-reset  { color: #888; }
+.side-btn.btn-solve  { color: #f5c542; }
+.side-btn.btn-undo   { color: #888; }
+.side-btn.btn-redo   { color: #888; }
+.side-btn.btn-theme  { color: #aaa; }
+ 
+/* Hide the old action-row in controls-panel — buttons moved to side panel */
+#action-row { display: none; }
+#theme-toggle { display: none; }

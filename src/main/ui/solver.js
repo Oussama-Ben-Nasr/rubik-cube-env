@@ -38,7 +38,7 @@ function setControlsLocked(locked) {
   const solveBtn = document.getElementById('solve-btn');
   if (solveBtn) {
     solveBtn.disabled = locked;
-    solveBtn.textContent = locked ? 'Solving…' : '✨ Solve';
+    solveBtn.textContent = locked ? '⏳' : '✨';
   }
 }
 

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { TrackballControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/TrackballControls.js";
-import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v10';
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v13';
 
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
@@ -28,18 +28,18 @@ const loadingOverlay =
 // axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
 // angleDelta: full rotation in radians (±π/2)
 const ACTION_META = [
-    { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  0  U
-    { axis: 1, layer: 1, angle: Math.PI / 2 },  //  1  U'
-    { axis: 1, layer: -1, angle: Math.PI / 2 },  //  2  D
-    { axis: 1, layer: -1, angle: -Math.PI / 2 },  //  3  D'
-    { axis: 2, layer: 1, angle: -Math.PI / 2 },  //  4  F
-    { axis: 2, layer: 1, angle: Math.PI / 2 },  //  5  F'
-    { axis: 2, layer: -1, angle: Math.PI / 2 },  //  6  B
-    { axis: 2, layer: -1, angle: -Math.PI / 2 },  //  7  B'
-    { axis: 0, layer: -1, angle: Math.PI / 2 },  //  8  L
-    { axis: 0, layer: -1, angle: -Math.PI / 2 },  //  9  L'
-    { axis: 0, layer: 1, angle: -Math.PI / 2 },  // 10  R
-    { axis: 0, layer: 1, angle: Math.PI / 2 },  // 11  R'
+    { axis: 1, layer: 1, angle: Math.PI / 2 },  //  0  U
+    { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  1  U'
+    { axis: 1, layer: -1, angle: -Math.PI / 2 },  //  2  D
+    { axis: 1, layer: -1, angle: Math.PI / 2 },  //  3  D'
+    { axis: 2, layer: 1, angle: Math.PI / 2 },  //  4  F
+    { axis: 2, layer: 1, angle: -Math.PI / 2 },  //  5  F'
+    { axis: 2, layer: -1, angle: -Math.PI / 2 },  //  6  B
+    { axis: 2, layer: -1, angle: Math.PI / 2 },  //  7  B'
+    { axis: 0, layer: -1, angle: -Math.PI / 2 },  //  8  L
+    { axis: 0, layer: -1, angle: Math.PI / 2 },  //  9  L'
+    { axis: 0, layer: 1, angle: Math.PI / 2 },  // 10  R
+    { axis: 0, layer: 1, angle: -Math.PI / 2 },  // 11  R'
 ];
 
 const AXES = [
@@ -75,11 +75,19 @@ let isCompeting = false;
 
 window.setCompeting = (val) => {
     isCompeting = val;
-    const btn = document.getElementById("snapshot-btn");
-    const createBtn = document.getElementById("snapshot-create-btn");
-    if (btn)       btn.disabled         = val;
-    if (createBtn) createBtn.disabled   = val;
-    if (btn)       btn.title            = val ? "Snapshots disabled during compete mode" : "Snapshots";
+    document.body.classList.toggle("competing", val);
+ 
+    // Snapshot buttons
+    const snapshotBtn = document.getElementById("snapshot-btn");
+    const createBtn   = document.getElementById("snapshot-create-btn");
+    if (snapshotBtn) { snapshotBtn.disabled = val; snapshotBtn.title = val ? "Disabled during compete" : "Snapshots"; }
+    if (createBtn)   { createBtn.disabled   = val; }
+ 
+    // Action buttons — solve/undo/redo locked during compete; reset always allowed
+    ["solve-btn", "btn-undo", "btn-redo"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = val;
+    });
 };
 
 const INVERSE_MOVE = {
@@ -780,7 +788,7 @@ window.toggleTheme = () => {
     const isLight = document.body.classList.toggle('light');
     scene.background = new THREE.Color(isLight ? LIGHT_BG : DARK_BG);
     document.getElementById('theme-toggle').textContent =
-        isLight ? '🌙 dark' : '☀️ light';
+        isLight ? '🌙' : '☀️';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 };
 
@@ -884,11 +892,16 @@ function renderSnapshotTree() {
 }
 
 function initSnapshotUI() {
-    const btn = document.getElementById("snapshot-btn");
-    const tree = document.getElementById("snapshot-tree");
-    if (!btn || !tree) return;
-
-    btn.onclick = () => { tree.hidden = !tree.hidden; };
+    const btn   = document.getElementById("snapshot-btn");
+    const tree  = document.getElementById("snapshot-tree");
+    const panel = document.getElementById("floating-side-panel");
+    if (!btn || !tree || !panel) return;
+ 
+    btn.onclick = () => {
+        const opening = tree.hidden;
+        tree.hidden   = !opening;
+        panel.classList.toggle("expanded", opening);
+    };
 }
 
 

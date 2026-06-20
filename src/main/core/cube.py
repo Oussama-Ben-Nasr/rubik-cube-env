@@ -140,18 +140,18 @@ class RubikCube3D:
 
     def apply_action(self, action: int):
         moves = [
-            lambda: self.U(-1),
             lambda: self.U(1),
-            lambda: self.D(-1),
+            lambda: self.U(-1),
             lambda: self.D(1),
-            lambda: self.F(-1),
+            lambda: self.D(-1),
             lambda: self.F(1),
-            lambda: self.B(-1),
+            lambda: self.F(-1),
             lambda: self.B(1),
-            lambda: self.L(-1),
+            lambda: self.B(-1),
             lambda: self.L(1),
-            lambda: self.R(-1),
+            lambda: self.L(-1),
             lambda: self.R(1),
+            lambda: self.R(-1),
         ]
         if not (0 <= action <= 11):
             raise ValueError("action must be 0–11")
