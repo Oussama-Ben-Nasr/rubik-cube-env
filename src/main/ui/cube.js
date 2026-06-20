@@ -596,32 +596,43 @@ function animateCameraReset() {
     return new Promise(resolve => {
         const startPos = camera.position.clone();
         const startTarget = controls.target.clone();
+        const startQuaternion = camera.quaternion.clone();
+
+        camera.position.copy(INITIAL_CAMERA_POSITION);
+        camera.up.set(0, 1, 0); 
+        camera.lookAt(INITIAL_TARGET);
+        const endQuaternion = camera.quaternion.clone();
+
+        camera.position.copy(startPos);
+        camera.quaternion.copy(startQuaternion);
 
         const duration = 500;
         const startTime = performance.now();
+
+        controls.enabled = false; 
 
         function tick() {
             const elapsed = performance.now() - startTime;
             const t = Math.min(elapsed / duration, 1);
             const eased = easeInOut(t);
 
-            camera.position.lerpVectors(
-                startPos,
-                INITIAL_CAMERA_POSITION,
-                eased
-            );
+            controls.target.lerpVectors(startTarget, INITIAL_TARGET, eased);
+            camera.position.lerpVectors(startPos, INITIAL_CAMERA_POSITION, eased);
+            camera.quaternion.slerpQuaternions(startQuaternion, endQuaternion, eased);
 
-            controls.target.lerpVectors(
-                startTarget,
-                INITIAL_TARGET,
-                eased
-            );
-
+            camera.up.set(0, 1, 0); 
             controls.update();
 
             if (t < 1) {
                 requestAnimationFrame(tick);
             } else {
+                camera.position.copy(INITIAL_CAMERA_POSITION);
+                camera.quaternion.copy(endQuaternion);
+                camera.up.set(0, 1, 0);
+                controls.target.copy(INITIAL_TARGET);
+                controls.update();
+                
+                controls.enabled = true;
                 resolve();
             }
         }
@@ -629,6 +640,7 @@ function animateCameraReset() {
         requestAnimationFrame(tick);
     });
 }
+
 
 let timerInterval = null;
 let startTime = null;
