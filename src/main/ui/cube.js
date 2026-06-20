@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { OrbitControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/OrbitControls.js";
-import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js';
+import { TrackballControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/TrackballControls.js";
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v13';
 
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
@@ -15,7 +15,6 @@ const INDEX_COLORS = [
 const DARK_BG = 0x0d1117;
 const LIGHT_BG = 0xf0ece4;
 
-// Change the function signature
 let currentLeaderboardFilter = 'all';
 
 const CUBIE_BODY_COLOR = 0x111111;
@@ -56,8 +55,7 @@ let scene, camera, renderer, controls;
 let cubieGroup = new THREE.Group();
 let animating = false;
 document.body.classList.remove("animating");
-let nickname =
-    localStorage.getItem("rubiks_nickname") || "";
+let nickname = localStorage.getItem("rubiks_nickname") || "";
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -71,6 +69,26 @@ const FACE_TO_MOVE = {
 };
 const moveHistory = [];
 const redoHistory = [];
+const snapshots = [];
+let currentSnapshotId = null;
+let isCompeting = false;
+
+window.setCompeting = (val) => {
+    isCompeting = val;
+    document.body.classList.toggle("competing", val);
+ 
+    // Snapshot buttons
+    const snapshotBtn = document.getElementById("snapshot-btn");
+    const createBtn   = document.getElementById("snapshot-create-btn");
+    if (snapshotBtn) { snapshotBtn.disabled = val; snapshotBtn.title = val ? "Disabled during compete" : "Snapshots"; }
+    if (createBtn)   { createBtn.disabled   = val; }
+ 
+    // Action buttons — solve/undo/redo locked during compete; reset always allowed
+    ["solve-btn", "btn-undo", "btn-redo"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = val;
+    });
+};
 
 const INVERSE_MOVE = {
     0: 1, 1: 0,
@@ -84,6 +102,8 @@ const INVERSE_MOVE = {
 init();
 initMoveHistory(moveHistory);
 initSolver();
+initSnapshotUI();
+
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'light') {
     document.body.classList.add('light');
@@ -235,8 +255,14 @@ function init() {
     renderer.setSize(window.innerWidth - SIDEBAR_W, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    controls = new TrackballControls(
+        camera,
+        renderer.domElement
+    );
+    controls.rotateSpeed = 5;
+    controls.zoomSpeed = 2;
+    controls.panSpeed = 1;
+
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9));
     const dir = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -578,32 +604,43 @@ function animateCameraReset() {
     return new Promise(resolve => {
         const startPos = camera.position.clone();
         const startTarget = controls.target.clone();
+        const startQuaternion = camera.quaternion.clone();
+
+        camera.position.copy(INITIAL_CAMERA_POSITION);
+        camera.up.set(0, 1, 0); 
+        camera.lookAt(INITIAL_TARGET);
+        const endQuaternion = camera.quaternion.clone();
+
+        camera.position.copy(startPos);
+        camera.quaternion.copy(startQuaternion);
 
         const duration = 500;
         const startTime = performance.now();
+
+        controls.enabled = false; 
 
         function tick() {
             const elapsed = performance.now() - startTime;
             const t = Math.min(elapsed / duration, 1);
             const eased = easeInOut(t);
 
-            camera.position.lerpVectors(
-                startPos,
-                INITIAL_CAMERA_POSITION,
-                eased
-            );
+            controls.target.lerpVectors(startTarget, INITIAL_TARGET, eased);
+            camera.position.lerpVectors(startPos, INITIAL_CAMERA_POSITION, eased);
+            camera.quaternion.slerpQuaternions(startQuaternion, endQuaternion, eased);
 
-            controls.target.lerpVectors(
-                startTarget,
-                INITIAL_TARGET,
-                eased
-            );
-
+            camera.up.set(0, 1, 0); 
             controls.update();
 
             if (t < 1) {
                 requestAnimationFrame(tick);
             } else {
+                camera.position.copy(INITIAL_CAMERA_POSITION);
+                camera.quaternion.copy(endQuaternion);
+                camera.up.set(0, 1, 0);
+                controls.target.copy(INITIAL_TARGET);
+                controls.update();
+                
+                controls.enabled = true;
                 resolve();
             }
         }
@@ -611,6 +648,7 @@ function animateCameraReset() {
         requestAnimationFrame(tick);
     });
 }
+
 
 let timerInterval = null;
 let startTime = null;
@@ -654,7 +692,6 @@ async function refreshLeaderboard() {
                 const secs = Math.floor(
                     r.solve_time_ms / 1000
                 );
-                //console.log(r);
 
                 return `
                     <div class="leaderboard-row">
@@ -751,7 +788,7 @@ window.toggleTheme = () => {
     const isLight = document.body.classList.toggle('light');
     scene.background = new THREE.Color(isLight ? LIGHT_BG : DARK_BG);
     document.getElementById('theme-toggle').textContent =
-        isLight ? '🌙 dark' : '☀️ light';
+        isLight ? '🌙' : '☀️';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 };
 
@@ -761,7 +798,6 @@ window.toggleTheme = () => {
 window.setLeaderboardFilter = (period) => {
     currentLeaderboardFilter = period;
 
-    // Update active button style
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('filter-btn--active');
     });
@@ -771,3 +807,104 @@ window.setLeaderboardFilter = (period) => {
 
     refreshLeaderboard();
 };
+
+window.resetCameraView = async () => {
+    await animateCameraReset();
+};
+
+window.createSnapshot = async () => {
+    if (isCompeting) return; 
+    const id = crypto.randomUUID();
+    const createdAt = new Date();
+    const label = `Snap ${snapshots.length + 1} — ${_fmtTime(createdAt)}`;
+
+    const res = await fetch("/snapshot/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot_id: id }),
+    });
+
+    if (!res.ok) {
+        console.error("Failed to save snapshot", await res.text());
+        return;
+    }
+
+    snapshots.push({ id, label, createdAt });
+    renderSnapshotTree();
+};
+
+async function restoreSnapshot(id) {
+    if (animating || isCompeting) return;
+
+    const res = await fetch("/snapshot/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot_id: id }),
+    });
+
+    if (!res.ok) {
+        console.error("Failed to load snapshot", await res.text());
+        return;
+    }
+
+    const state = await fetch("/cube").then(r => r.json());
+    renderCube(state);
+
+    document.querySelectorAll(".snapshot-node").forEach(n => {
+        n.classList.toggle("snapshot-node--active", n.dataset.id === id);
+    });
+}
+
+function renderSnapshotTree() {
+    const container = document.getElementById("snapshot-tree");
+    let list = container.querySelector(".snapshot-list");
+    if (!list) {
+        list = document.createElement("div");
+        list.className = "snapshot-list";
+        container.appendChild(list);
+    }
+
+    list.innerHTML = "";
+
+    if (snapshots.length === 0) {
+        list.innerHTML = `<p class="snapshot-empty">No snapshots yet.</p>`;
+        return;
+    }
+
+    [...snapshots].reverse().forEach(snap => {
+        const node = document.createElement("div");
+        node.className = "snapshot-node";
+        node.dataset.id = snap.id;
+        node.title = snap.label;
+        node.onclick = () => restoreSnapshot(snap.id);
+
+        const dot = document.createElement("span");
+        dot.className = "snapshot-dot";
+
+        const lbl = document.createElement("span");
+        lbl.className = "snapshot-label";
+        lbl.textContent = snap.label;
+
+        node.appendChild(dot);
+        node.appendChild(lbl);
+        list.appendChild(node);
+    });
+}
+
+function initSnapshotUI() {
+    const btn   = document.getElementById("snapshot-btn");
+    const tree  = document.getElementById("snapshot-tree");
+    const panel = document.getElementById("floating-side-panel");
+    if (!btn || !tree || !panel) return;
+ 
+    btn.onclick = () => {
+        const opening = tree.hidden;
+        tree.hidden   = !opening;
+        panel.classList.toggle("expanded", opening);
+    };
+}
+
+
+function _fmtTime(date) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}

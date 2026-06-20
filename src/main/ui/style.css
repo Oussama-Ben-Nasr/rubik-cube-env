@@ -578,3 +578,408 @@ body.light .history-badge--solver {
 .modal-overlay.visible {
     display: flex;
 }
+
+#camera-home-btn {
+    position: fixed;
+    top: 120px;
+    right: 340px;
+    /* left of timer panel */
+    width: 54px;
+    height: 54px;
+
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+
+    background: var(--panel-bg);
+    color: #66d9c0;
+
+    font-size: 24px;
+    cursor: pointer;
+
+    backdrop-filter: blur(8px);
+
+    transition: all .2s ease;
+
+    z-index: 1000;
+}
+
+#camera-home-btn:hover {
+    transform: scale(1.05);
+    border-color: #66d9c0;
+    box-shadow: 0 0 15px rgba(102, 217, 192, .3);
+}
+
+#camera-home-btn {
+    position: fixed;
+    top: 120px;
+    right: 340px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    color: #66d9c0;
+    font-size: 24px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#camera-home-btn:hover {
+    transform: scale(1.05);
+    border-color: #66d9c0;
+    box-shadow: 0 0 15px rgba(102, 217, 192, 0.3);
+}
+
+#snapshot-btn {
+    position: fixed;
+    top: 184px;
+    /* below camera-home-btn with 10px gap */
+    right: 340px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    color: #a88be8;
+    font-size: 22px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#snapshot-btn:hover {
+    transform: scale(1.05);
+    border-color: #a88be8;
+    box-shadow: 0 0 15px rgba(168, 139, 232, 0.3);
+}
+
+/* ── Snapshot tree panel ── */
+
+#snapshot-tree {
+    position: fixed;
+    top: 120px;
+    right: 404px;
+    /* 340 + 54 + 10 */
+    z-index: 1000;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 170px;
+    max-height: 340px;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#snapshot-tree[hidden] {
+    display: none;
+}
+
+.snapshot-empty {
+    font-size: 11px;
+    color: #444;
+    font-family: ui-monospace, monospace;
+}
+
+.snapshot-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.snapshot-node:hover {
+    background: rgba(168, 139, 232, 0.08);
+    border-color: rgba(168, 139, 232, 0.2);
+}
+
+.snapshot-node--active {
+    background: rgba(168, 139, 232, 0.12);
+    border-color: rgba(168, 139, 232, 0.35);
+}
+
+.snapshot-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #a88be8;
+    flex-shrink: 0;
+}
+
+.snapshot-node--active .snapshot-dot {
+    background: #66d9c0;
+    box-shadow: 0 0 6px rgba(102, 217, 192, 0.5);
+}
+
+.snapshot-label {
+    font-size: 11px;
+    color: #888;
+    font-family: ui-monospace, monospace;
+    white-space: nowrap;
+}
+
+.snapshot-node--active .snapshot-label {
+    color: #ccc;
+}
+
+#snapshot-controls #snapshot-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.snapshot-list::-webkit-scrollbar {
+    width: 3px;
+}
+
+.snapshot-list::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+}
+
+#snapshot-controls {
+    position: fixed;
+    top: 184px;
+    right: 340px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+ 
+/* Snapshot disabled during compete mode */
+#snapshot-btn:disabled,
+#snapshot-create-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+ 
+/* Snapshot nodes unclickable during compete mode */
+body.competing .snapshot-node {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+ 
+/* ==========================================================================
+   Slim vertical side panel — replaces all individual fixed positioning (v11)
+   ========================================================================== */
+ 
+/* Remove old standalone positioning for these elements */
+#camera-home-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-controls {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+ 
+#snapshot-tree {
+    position: static;
+    top: unset;
+    right: unset;
+    max-height: unset;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+}
+ 
+/* The unified panel */
+#floating-side-panel {
+    position: fixed;
+    top: 50%;
+    right: 340px;          /* left of the timer/history panel */
+    transform: translateY(-50%);
+    z-index: 1000;
+ 
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+ 
+    width: 54px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 27px;
+    padding: 8px 0;
+    gap: 0;
+ 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;      /* keeps children clipped to the pill shape */
+    transition: width 0.25s ease;
+}
+ 
+/* When the snapshot tree is open the panel widens to show labels */
+#floating-side-panel.expanded {
+    width: 220px;
+    border-radius: 14px;
+}
+ 
+/* Both icon buttons share the same style inside the panel */
+#floating-side-panel .side-btn {
+    width: 100%;
+    height: 54px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: #66d9c0;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+ 
+#floating-side-panel .side-btn:hover {
+    background: rgba(255,255,255,0.05);
+}
+ 
+#floating-side-panel .side-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+ 
+#snapshot-btn {
+    color: #a88be8;
+}
+ 
+/* Thin divider between the two buttons */
+.side-panel-divider {
+    height: 1px;
+    background: var(--panel-border);
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+ 
+/* Snapshot tree lives inside the panel, below the buttons */
+#snapshot-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding: 0 8px;
+}
+ 
+#snapshot-tree:not([hidden]) {
+    max-height: 500px;
+    padding: 8px 8px;
+    border-top: 1px solid var(--panel-border);
+}
+ 
+#snapshot-create-btn {
+    width: 100%;
+    padding: 7px 0;
+    background: rgba(168,139,232,0.1);
+    border: 1px solid rgba(168,139,232,0.25);
+    border-radius: 6px;
+    color: #a88be8;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    cursor: pointer;
+    transition: background 0.12s;
+    flex-shrink: 0;
+}
+ 
+#snapshot-create-btn:hover  { background: rgba(168,139,232,0.18); }
+#snapshot-create-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+ 
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+.snapshot-list::-webkit-scrollbar       { width: 3px; }
+.snapshot-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+ 
+body.competing .snapshot-node {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Tooltip on hover for slim mode */
+#floating-side-panel .side-btn {
+    position: relative;
+}
+ 
+#floating-side-panel .side-btn::after {
+    content: attr(data-label);
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #aaa;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+ 
+#floating-side-panel:not(.expanded) .side-btn:hover::after {
+    opacity: 1;
+}
+ 
+/* Color coding for action buttons */
+.side-btn.btn-reset  { color: #888; }
+.side-btn.btn-solve  { color: #f5c542; }
+.side-btn.btn-undo   { color: #888; }
+.side-btn.btn-redo   { color: #888; }
+.side-btn.btn-theme  { color: #aaa; }
+ 
+/* Hide the old action-row in controls-panel — buttons moved to side panel */
+#action-row { display: none; }
+#theme-toggle { display: none; }

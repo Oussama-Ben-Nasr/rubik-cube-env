@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 from uuid import uuid4
 from fastapi import Request, Response
 from fastapi import Header
+from typing import Literal
+from time import time
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(message)s")
@@ -22,25 +25,35 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 cubes: dict[str, RubikCube3D] = {}
+snapshots: dict[str, dict[str, list]] = {}
 historical_moves = deque()
 SOLVES_TABLE = "solves_dev" if os.getenv("RUBIK_CUBE_DEV", "").lower() == "true" else "solves"
 
-def get_cube(request: Request, response: Response) -> RubikCube3D:
-    session_id = request.cookies.get("session_id")
-
-    if not session_id:
-        session_id = str(uuid4())
+def _session_id(request: Request, response: Response) -> str:
+    """Return existing session cookie or mint a new one."""
+    sid = request.cookies.get("session_id")
+    if not sid:
+        sid = str(uuid4())
         response.set_cookie(
             "session_id",
-            session_id,
+            sid,
             max_age=60 * 60 * 24 * 30,
             samesite="lax",
         )
+    return sid
 
-    if session_id not in cubes:
-        cubes[session_id] = RubikCube3D()
-
-    return cubes[session_id]
+def get_cube(request: Request, response: Response) -> RubikCube3D:
+    sid = _session_id(request, response)
+    if sid not in cubes:
+        cubes[sid] = RubikCube3D()
+    return cubes[sid]
+ 
+ 
+def get_snapshots(request: Request, response: Response) -> dict[str, list]:
+    sid = _session_id(request, response)
+    if sid not in snapshots:
+        snapshots[sid] = {}
+    return snapshots[sid]
 
 app.mount(
     "/static",
@@ -202,41 +215,116 @@ def status(
 
     return cube.status()
 
-from datetime import datetime, timezone
-from typing import Literal
-
 @app.get("/leaderboard")
 def leaderboard(period: Literal["today", "all"] = "all"):
-    conn = get_conn()
+    start = time()
 
-    date_filter = "and created_at >= current_date" if period == "today" else ""
+    logger.info(
+        f"Leaderboard request started period={period}"
+    )
 
-    with conn.cursor() as cur:
-        sql = f"""
-            select distinct on (nickname)
-                nickname,
-                solve_time_ms,
-                moves,
-                created_at
-            from {SOLVES_TABLE}
-            where id > 0
-              {date_filter}
-            order by nickname, solve_time_ms asc
-            """
-        cur.execute(
-            sql,
+    try:
+
+        # existing code
+        conn = get_conn()
+
+        date_filter = "and created_at >= current_date" if period == "today" else ""
+
+        with conn.cursor() as cur:
+            sql = f"""
+                select distinct on (nickname)
+                    nickname,
+                    solve_time_ms,
+                    moves,
+                    created_at
+                from {SOLVES_TABLE}
+                where id > 0
+                    {date_filter}
+                order by nickname, solve_time_ms asc
+                """
+            cur.execute(
+                sql,
+            )
+            rows = cur.fetchall()
+
+        rows.sort(key=lambda r: r[1])
+        rows = rows[:20]
+
+
+        logger.info(
+            f"Leaderboard request finished "
+            f"in {(time()-start):.3f}s"
         )
-        rows = cur.fetchall()
 
-    rows.sort(key=lambda r: r[1])
-    rows = rows[:20]
+        return [
+            {
+                "nickname": row[0],
+                "solve_time_ms": row[1],
+                "moves": row[2],
+                "created_at": row[3],
+            }
+            for row in rows
+        ]
 
-    return [
-        {
-            "nickname": row[0],
-            "solve_time_ms": row[1],
-            "moves": row[2],
-            "created_at": row[3],
-        }
-        for row in rows
-    ]
+    except Exception:
+
+        logger.exception(
+            "Leaderboard request failed"
+        )
+
+        raise
+
+    finally:
+
+        logger.info(
+            f"Leaderboard request cleanup "
+            f"in {(time()-start):.3f}s"
+        )
+
+
+@app.post("/snapshot/save")
+def save_snapshot(body: dict, request: Request, response: Response):
+    """
+    Body: { "snapshot_id": "<uuid>" }
+    Saves the current cube state under that id for this session.
+    """
+    snapshot_id = body.get("snapshot_id")
+    if not snapshot_id:
+        return {"status": "error", "detail": "snapshot_id required"}, 400
+ 
+    cube  = get_cube(request, response)
+    store = get_snapshots(request, response)
+    store[snapshot_id] = cube.get_state()
+ 
+    logger.info(f"Snapshot saved id={snapshot_id}")
+    return {"status": "ok", "snapshot_id": snapshot_id}
+
+
+@app.post("/snapshot/load")
+def load_snapshot(body: dict, request: Request, response: Response):
+    """
+    Body: { "snapshot_id": "<uuid>" }
+    Restores the cube to the state stored under that id.
+    """
+    snapshot_id = body.get("snapshot_id")
+    if not snapshot_id:
+        return {"status": "error", "detail": "snapshot_id required"}, 400
+ 
+    store = get_snapshots(request, response)
+ 
+    # FIX: was doing snapshots["cubeState"] — wrong key, wrong dict
+    if snapshot_id not in store:
+        return {"status": "error", "detail": "snapshot not found"}, 404
+ 
+    cube = get_cube(request, response)
+    cube.load_state(store[snapshot_id])
+ 
+    logger.info(f"Snapshot loaded id={snapshot_id}")
+    return {"status": "ok"}
+
+ 
+@app.get("/snapshot/list")
+def list_snapshots(request: Request, response: Response):
+    """Return all snapshot ids for this session."""
+    store = get_snapshots(request, response)
+    return {"snapshot_ids": list(store.keys())}
