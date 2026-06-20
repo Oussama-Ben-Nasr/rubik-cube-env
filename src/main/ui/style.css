@@ -578,3 +578,205 @@ body.light .history-badge--solver {
 .modal-overlay.visible {
     display: flex;
 }
+
+#camera-home-btn {
+    position: fixed;
+    top: 120px;
+    right: 340px;
+    /* left of timer panel */
+    width: 54px;
+    height: 54px;
+
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+
+    background: var(--panel-bg);
+    color: #66d9c0;
+
+    font-size: 24px;
+    cursor: pointer;
+
+    backdrop-filter: blur(8px);
+
+    transition: all .2s ease;
+
+    z-index: 1000;
+}
+
+#camera-home-btn:hover {
+    transform: scale(1.05);
+    border-color: #66d9c0;
+    box-shadow: 0 0 15px rgba(102, 217, 192, .3);
+}
+
+#camera-home-btn {
+    position: fixed;
+    top: 120px;
+    right: 340px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    color: #66d9c0;
+    font-size: 24px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#camera-home-btn:hover {
+    transform: scale(1.05);
+    border-color: #66d9c0;
+    box-shadow: 0 0 15px rgba(102, 217, 192, 0.3);
+}
+
+#snapshot-btn {
+    position: fixed;
+    top: 184px;
+    /* below camera-home-btn with 10px gap */
+    right: 340px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    color: #a88be8;
+    font-size: 22px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#snapshot-btn:hover {
+    transform: scale(1.05);
+    border-color: #a88be8;
+    box-shadow: 0 0 15px rgba(168, 139, 232, 0.3);
+}
+
+/* ── Snapshot tree panel ── */
+
+#snapshot-tree {
+    position: fixed;
+    top: 120px;
+    right: 404px;
+    /* 340 + 54 + 10 */
+    z-index: 1000;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 170px;
+    max-height: 340px;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#snapshot-tree[hidden] {
+    display: none;
+}
+
+.snapshot-empty {
+    font-size: 11px;
+    color: #444;
+    font-family: ui-monospace, monospace;
+}
+
+.snapshot-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.snapshot-node:hover {
+    background: rgba(168, 139, 232, 0.08);
+    border-color: rgba(168, 139, 232, 0.2);
+}
+
+.snapshot-node--active {
+    background: rgba(168, 139, 232, 0.12);
+    border-color: rgba(168, 139, 232, 0.35);
+}
+
+.snapshot-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #a88be8;
+    flex-shrink: 0;
+}
+
+.snapshot-node--active .snapshot-dot {
+    background: #66d9c0;
+    box-shadow: 0 0 6px rgba(102, 217, 192, 0.5);
+}
+
+.snapshot-label {
+    font-size: 11px;
+    color: #888;
+    font-family: ui-monospace, monospace;
+    white-space: nowrap;
+}
+
+.snapshot-node--active .snapshot-label {
+    color: #ccc;
+}
+
+#snapshot-controls #snapshot-btn {
+    position: static;
+    top: unset;
+    right: unset;
+}
+
+.snapshot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.snapshot-list::-webkit-scrollbar {
+    width: 3px;
+}
+
+.snapshot-list::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+}
+
+#snapshot-controls {
+    position: fixed;
+    top: 184px;
+    right: 340px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+ 
+/* Snapshot disabled during compete mode */
+#snapshot-btn:disabled,
+#snapshot-create-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}

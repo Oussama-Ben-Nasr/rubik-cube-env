@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { OrbitControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/OrbitControls.js";
-import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js';
+import { TrackballControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/TrackballControls.js";
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v10';
 
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
@@ -15,7 +15,6 @@ const INDEX_COLORS = [
 const DARK_BG = 0x0d1117;
 const LIGHT_BG = 0xf0ece4;
 
-// Change the function signature
 let currentLeaderboardFilter = 'all';
 
 const CUBIE_BODY_COLOR = 0x111111;
@@ -71,6 +70,18 @@ const FACE_TO_MOVE = {
 };
 const moveHistory = [];
 const redoHistory = [];
+const snapshots = [];
+let currentSnapshotId = null;
+let isCompeting = false;
+
+window.setCompeting = (val) => {
+    isCompeting = val;
+    const btn = document.getElementById("snapshot-btn");
+    const createBtn = document.getElementById("snapshot-create-btn");
+    if (btn)       btn.disabled         = val;
+    if (createBtn) createBtn.disabled   = val;
+    if (btn)       btn.title            = val ? "Snapshots disabled during compete mode" : "Snapshots";
+};
 
 const INVERSE_MOVE = {
     0: 1, 1: 0,
@@ -84,6 +95,8 @@ const INVERSE_MOVE = {
 init();
 initMoveHistory(moveHistory);
 initSolver();
+initSnapshotUI();
+
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'light') {
     document.body.classList.add('light');
@@ -235,8 +248,14 @@ function init() {
     renderer.setSize(window.innerWidth - SIDEBAR_W, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    controls = new TrackballControls(
+        camera,
+        renderer.domElement
+    );
+    controls.rotateSpeed = 5;
+    controls.zoomSpeed = 2;
+    controls.panSpeed = 1;
+
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9));
     const dir = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -654,7 +673,6 @@ async function refreshLeaderboard() {
                 const secs = Math.floor(
                     r.solve_time_ms / 1000
                 );
-                //console.log(r);
 
                 return `
                     <div class="leaderboard-row">
@@ -761,7 +779,6 @@ window.toggleTheme = () => {
 window.setLeaderboardFilter = (period) => {
     currentLeaderboardFilter = period;
 
-    // Update active button style
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('filter-btn--active');
     });
@@ -771,3 +788,99 @@ window.setLeaderboardFilter = (period) => {
 
     refreshLeaderboard();
 };
+
+window.resetCameraView = async () => {
+    await animateCameraReset();
+};
+
+window.createSnapshot = async () => {
+    if (isCompeting) return; 
+    const id = crypto.randomUUID();
+    const createdAt = new Date();
+    const label = `Snap ${snapshots.length + 1} — ${_fmtTime(createdAt)}`;
+
+    const res = await fetch("/snapshot/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot_id: id }),
+    });
+
+    if (!res.ok) {
+        console.error("Failed to save snapshot", await res.text());
+        return;
+    }
+
+    snapshots.push({ id, label, createdAt });
+    renderSnapshotTree();
+};
+
+async function restoreSnapshot(id) {
+    if (animating || isCompeting) return;
+
+    const res = await fetch("/snapshot/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot_id: id }),
+    });
+
+    if (!res.ok) {
+        console.error("Failed to load snapshot", await res.text());
+        return;
+    }
+
+    const state = await fetch("/cube").then(r => r.json());
+    renderCube(state);
+
+    document.querySelectorAll(".snapshot-node").forEach(n => {
+        n.classList.toggle("snapshot-node--active", n.dataset.id === id);
+    });
+}
+
+function renderSnapshotTree() {
+    const container = document.getElementById("snapshot-tree");
+    let list = container.querySelector(".snapshot-list");
+    if (!list) {
+        list = document.createElement("div");
+        list.className = "snapshot-list";
+        container.appendChild(list);
+    }
+
+    list.innerHTML = "";
+
+    if (snapshots.length === 0) {
+        list.innerHTML = `<p class="snapshot-empty">No snapshots yet.</p>`;
+        return;
+    }
+
+    [...snapshots].reverse().forEach(snap => {
+        const node = document.createElement("div");
+        node.className = "snapshot-node";
+        node.dataset.id = snap.id;
+        node.title = snap.label;
+        node.onclick = () => restoreSnapshot(snap.id);
+
+        const dot = document.createElement("span");
+        dot.className = "snapshot-dot";
+
+        const lbl = document.createElement("span");
+        lbl.className = "snapshot-label";
+        lbl.textContent = snap.label;
+
+        node.appendChild(dot);
+        node.appendChild(lbl);
+        list.appendChild(node);
+    });
+}
+
+function initSnapshotUI() {
+    const btn = document.getElementById("snapshot-btn");
+    const tree = document.getElementById("snapshot-tree");
+    if (!btn || !tree) return;
+
+    btn.onclick = () => { tree.hidden = !tree.hidden; };
+}
+
+
+function _fmtTime(date) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}

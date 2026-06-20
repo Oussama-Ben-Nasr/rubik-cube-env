@@ -232,5 +232,25 @@ class RubikCube3D:
                 "is_competing": self._competing
             }
 
+    def get_state(self) -> list[dict]:
+        """Return a serialisable snapshot of all cubies."""
+        return [
+            {
+                "pos": c.pos.tolist(),
+                "colors": dict(c.colors),
+            }
+            for c in self.cubies
+        ]
+ 
+    def load_state(self, state: list[dict]) -> None:
+        """Restore cubies from a snapshot produced by get_state()."""
+        self.cubies = [
+            Cubie(
+                pos=np.array(entry["pos"], dtype=int),
+                colors=dict(entry["colors"]),
+            )
+            for entry in state
+        ]
+
     def is_competing(self):
         return self._competing and self._start_solve != None

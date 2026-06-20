@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rubik's Cube</title>
-  <link rel="stylesheet" href="/static/style.css?v5">
+  <link rel="stylesheet" href="/static/style.css?v10">
 </head>
 <div id="alert-modal" class="modal-overlay">
   <div class="modal-box">
@@ -54,7 +54,6 @@
 </div>
 
 <body>
-
   <div id="stats-panel">
 
     <span class="app-title">Rubik's cube</span>
@@ -96,7 +95,7 @@
     <hr class="divider">
 
     <div id="action-row">
-      <button id="btn-reset" onclick="doReset()">↺ reset</button>
+      <button id="btn-reset" onclick="setCompeting(false); doReset()">↺ reset</button>
       <button id="solve-btn">✨ Solve</button>
       <button id="btn-undo" onclick="doUndo()">↩ undo</button>
       <button id="btn-redo" onclick="doRedo()">↪ redo</button>
@@ -120,9 +119,17 @@
     <div id="timer-display">--:--:--</div>
     <div id="move-counter">moves: <span id="count">-</span></div>
     <hr class="divider">
-    <button id="btn-scramble" onclick="doScramble()">⚡ compete</button>
+    <button id="btn-scramble" onclick="setCompeting(true); doScramble()">⚡ compete</button>
 
   </div>
+  <button id="camera-home-btn" onclick="resetCameraView()" title="Reset camera">⌂</button>
+  <div id="snapshot-controls">
+    <button id="snapshot-btn" title="Snapshots">💾</button>
+    <div id="snapshot-tree" hidden>
+      <button id="snapshot-create-btn" onclick="createSnapshot()">+ save snapshot</button>
+    </div>
+  </div>
+
   <script type="importmap">
 {
   "imports": {
@@ -130,7 +137,7 @@
   }
 }
 </script>
-  <script type="module" src="/static/cube.js?v5"></script>
+  <script type="module" src="/static/cube.js?v10"></script>
 </body>
 
 </html>

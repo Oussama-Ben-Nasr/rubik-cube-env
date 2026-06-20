@@ -14,6 +14,9 @@ def get_conn():
     global _conn
 
     if _conn is None or _conn.closed:
-        _conn = psycopg.connect(DATABASE_URL)
+        _conn = psycopg.connect(
+                DATABASE_URL,
+                connect_timeout=5
+        )
 
     return _conn
