@@ -225,7 +225,6 @@ def leaderboard(period: Literal["today", "all"] = "all"):
 
     try:
 
-        # existing code
         conn = get_conn()
 
         date_filter = "and created_at >= current_date" if period == "today" else ""
@@ -311,8 +310,7 @@ def load_snapshot(body: dict, request: Request, response: Response):
         return {"status": "error", "detail": "snapshot_id required"}, 400
  
     store = get_snapshots(request, response)
- 
-    # FIX: was doing snapshots["cubeState"] — wrong key, wrong dict
+
     if snapshot_id not in store:
         return {"status": "error", "detail": "snapshot not found"}, 404
  
@@ -341,4 +339,4 @@ def load_facelets(body: dict,
     )
     logger.info(res)
 
-    return {"status":"ok"}
+    return res

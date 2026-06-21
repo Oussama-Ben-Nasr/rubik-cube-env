@@ -1,15 +1,15 @@
 import * as THREE from "three";
 import { TrackballControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/TrackballControls.js";
-import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v13';
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v16';
 
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
-    0xffffff, // 0  U  white
-    0x00cc44, // 1  F  green
-    0xffdd00, // 2  D  yellow
-    0xff8800, // 3  L  orange
-    0x1144ff, // 4  B  blue
-    0xee1111, // 5  R  red
+    0xffffff, // 0  U  white  
+    0x00cc44, // 1  F  green  
+    0xffdd00, // 2  D  yellow 
+    0xff8800, // 3  L  orange 
+    0x1144ff, // 4  B  blue   
+    0xee1111, // 5  R  red    
 ];
 
 const DARK_BG = 0x0d1117;
@@ -24,9 +24,6 @@ const ANIM_DURATION_MS = 280;
 const loadingOverlay =
     document.getElementById("loading-overlay");
 
-// Action → { axis, layerValue, direction, angleDelta }
-// axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
-// angleDelta: full rotation in radians (±π/2)
 const ACTION_META = [
     { axis: 1, layer: 1, angle: Math.PI / 2 },  //  0  U
     { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  1  U'
@@ -755,10 +752,6 @@ window.shareTo = (platform) => {
     document.getElementById("share-menu").hidden = true;
 };
 
-// ---------------------------------------------------------------------------
-// Keyboard shortcuts
-// U/D/F/B/L/R = normal move, Shift+key = prime (inverse)
-// ---------------------------------------------------------------------------
 const KEY_TO_MOVE = {
     'u': 0, 'U': 1,
     'd': 2, 'D': 3,
@@ -774,8 +767,8 @@ document.addEventListener('keydown', (e) => {
     if (document.getElementById('solve-btn').disabled) return;
 
     const key = e.shiftKey
-        ? e.key.toUpperCase()   // Shift+U → 'U' → prime
-        : e.key.toLowerCase();  // u → normal
+        ? e.key.toUpperCase() 
+        : e.key.toLowerCase();
 
     const moveId = KEY_TO_MOVE[key];
     if (moveId === undefined) return;
@@ -908,119 +901,119 @@ function initSnapshotUI() {
 function _fmtTime(date) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
-let stream = null;
-const captures = [];
+let currentFaceIndex = 0;
+const faceSequence = ["U", "F", "R", "D", "B", "L"];
+const faceDataMap = {};
 
-window.openCubeScanner = async () => {
-    const modal = document.getElementById("camera-modal");
-    const video = document.getElementById("camera-video");
-
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: "environment",
-                width: { ideal: 640 },
-                height: { ideal: 480 }
-            }
-        });
-        
-        video.srcObject = stream;
-        modal.hidden = false;
-
-        video.onloadedmetadata = () => {
-            // Wait for elements to layout completely before sizing canvas
-            requestAnimationFrame(drawScannerGrid);
-        };
-    } catch (err) {
-        console.error("Camera access blocked or unavailable:", err);
+const colorTokens = ["W", "G", "R", "Y", "B", "O"];
+const colorHexMap = {
+    "W": "#ffffff", "G": "#00ff55", "R": "#ff2a2a",
+    "Y": "#ffdd00", "B": "#0066ff", "O": "#ff8800"
+};
+const faceMeta = {
+    "U": { 
+        name: "White", 
+        primary: "W", 
+        hiddenNotes: "Keep GREEN facing front. Look at the TOP face." 
+    },
+    "F": { 
+        name: "Green", 
+        primary: "G", 
+        hiddenNotes: "Keep WHITE on top. Look at the FRONT face." 
+    },
+    "R": { 
+        name: "Red", 
+        primary: "R",   
+        hiddenNotes: "Keep WHITE on top. Look at the RIGHT face (turn cube left)." 
+    },
+    "D": { 
+        name: "Yellow", 
+        primary: "Y", 
+        hiddenNotes: "Keep GREEN facing front. Look at the BOTTOM face." 
+    },
+    "B": { 
+        name: "Blue", 
+        primary: "B",   
+        hiddenNotes: "Keep WHITE on top. Look at the BACK face (turn cube around)." 
+    },
+    "L": { 
+        name: "Orange", 
+        primary: "O", 
+        hiddenNotes: "Keep WHITE on top. Look at the LEFT face (turn cube right)." 
     }
 };
 
-function drawScannerGrid() {
-    const canvas = document.getElementById("camera-overlay");
-    if (!canvas) return;
+let activeFaceBuffer = Array(9).fill("W");
 
-    const ctx = canvas.getContext("2d");
+window.openCubeScanner = () => {
+    const modal = document.getElementById("camera-modal");
+    const banner = document.getElementById("scanner-error-banner");
+    if (banner) banner.style.display = "none"; // Clear stale errors
     
-    // Set actual render resolution matching layout bounds
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    currentFaceIndex = 0;
+    modal.hidden = false;
+    initFaceBuffer();
+};
 
-    // Adjust grid dimension relative to layout size (e.g., 50% of minimum width/height)
-    const size = Math.min(canvas.width, canvas.height) * 0.55;
-    const startX = (canvas.width - size) / 2;
-    const startY = (canvas.height - size) / 2;
-    const cell = size / 3;
+function initFaceBuffer() {
+    const targetFace = faceSequence[currentFaceIndex];
+    const meta = faceMeta[targetFace];
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Grid boxes styling
-    ctx.strokeStyle = "#00ff88";
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = "#00ff88";
-
-    for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-            ctx.strokeRect(
-                startX + c * cell,
-                startY + r * cell,
-                cell,
-                cell
-            );
-        }
+    if (faceDataMap[targetFace]) {
+        activeFaceBuffer = [...faceDataMap[targetFace]];
+    } else {
+        activeFaceBuffer = Array(9).fill(meta.primary);
     }
+
+    const statusText = document.getElementById("camera-status");
+    const hintText = document.getElementById("camera-hint");
+
+    statusText.innerHTML = `Editing Face: <span style="color: ${colorHexMap[meta.primary]}; font-weight: bold;">${targetFace} (${meta.name})</span>`;
+
+    hintText.innerHTML = `
+        <div style="margin-bottom: 8px; color: #e4e4e7; font-weight: 500;">Click cells to cycle colors. Center is locked.</div>
+        <div style="font-size: 0.85rem; color: #f43f5e; background: rgba(244, 63, 94, 0.08); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.2); text-align: left; line-height: 1.4;">
+            ⚠️ <strong>Mandatory Holding Position:</strong><br>
+            ${meta.hiddenNotes}
+        </div>
+    `;
+
+    renderEditorGrid();
 }
 
-// Recalculate grid dynamically if layout scales up/down
-window.addEventListener("resize", () => {
-    const modal = document.getElementById("camera-modal");
-    if (modal && !modal.hidden) {
-        drawScannerGrid();
-    }
-});
-const faceSequence = ["U", "F", "R", "D", "B", "L"]; // Order of cube faces to capture
-let currentFaceIndex = 0;
-const faceDataMap = {}; // Holds captured color arrays or images
+function renderEditorGrid() {
+    const cells = document.querySelectorAll(".editor-cell");
+    cells.forEach((cell, idx) => {
+        const token = activeFaceBuffer[idx];
+        cell.style.backgroundColor = colorHexMap[token];
+    });
+}
+
+window.cycleCellColor = (element) => {
+    const idx = parseInt(element.getAttribute("data-idx"), 10);
+    if (idx === 4) return;
+
+    const currentToken = activeFaceBuffer[idx];
+    let nextIdx = (colorTokens.indexOf(currentToken) + 1) % colorTokens.length;
+    activeFaceBuffer[idx] = colorTokens[nextIdx];
+    
+    element.style.backgroundColor = colorHexMap[activeFaceBuffer[idx]];
+};
+
 async function captureCurrentView() {
-    const video = document.getElementById("camera-video");
     const statusText = document.getElementById("camera-status");
-    
-    if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
-        console.warn("Video stream not ready yet.");
-        return;
-    }
-
-    // 1. Capture snapshot to offscreen canvas
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
-
-    // 2. Visual feedback flash effect
-    video.style.opacity = "0.3";
-    setTimeout(() => video.style.opacity = "1", 150);
-
+    const banner = document.getElementById("scanner-error-banner");
     const activeFace = faceSequence[currentFaceIndex];
-    
-    // [Placeholder for your HSV / Face Mapping Task]
-    // For now, let's populate dummy facelet color strings (e.g. 'w','w','w'...) 
-    // until your HSV classification logic extracts colors from the 3x3 zones
-    faceDataMap[activeFace] = Array(9).fill("w"); 
-    
-    console.log(`Captured face ${activeFace}:`, canvas);
 
-    // 3. Move to the next face configuration
+    faceDataMap[activeFace] = [...activeFaceBuffer];
     currentFaceIndex++;
 
     if (currentFaceIndex < faceSequence.length) {
-        const nextFace = faceSequence[currentFaceIndex];
-        statusText.innerHTML = `Scan Face: <strong>${nextFace}</strong>`;
+        initFaceBuffer();
     } else {
-        // All faces captured! Send payload to your backend '/cube/load_facelets'
-        statusText.innerText = "Processing Cube Matrix...";
-        
+        statusText.innerHTML = `<span style="color: #ffdd00;">Checking data metrics consistency...</span>`;
+        if (banner) banner.style.display = "none";
+
         try {
             const response = await fetch("/cube/load_facelets", {
                 method: "POST",
@@ -1030,39 +1023,28 @@ async function captureCurrentView() {
             const result = await response.json();
             
             if (result.status === "ok") {
-                statusText.innerText = "Cube Scanned Successfully!";
-                setTimeout(closeCubeScanner, 1200);
+                statusText.innerHTML = "<span style=\"color: #00ff88; font-weight: bold;\">🎉 State Loaded Successfully!</span>";
+                setTimeout(() => { document.getElementById("camera-modal").hidden = true; }, 1200);
+                const state = await fetch("/cube").then(r => r.json());
+                renderCube(state);
+            } else {
+                if (banner) {
+                    banner.innerText = `⚠️ Scan Rejected: ${result.reason}`;
+                    banner.style.display = "block";
+                }
             }
+            currentFaceIndex = 0;
+            initFaceBuffer();
         } catch (err) {
-            statusText.innerText = "Error syncing payload to server.";
-            console.error(err);
+            statusText.innerHTML = `<span style="color: #ff2a2a;">Network pipeline connection error.</span>`;
+            currentFaceIndex = 0;
+            initFaceBuffer();
         }
     }
 }
-
-// Reset tracker index whenever scanner is reopened
-const originalOpenScanner = window.openCubeScanner;
-window.openCubeScanner = async () => {
-    currentFaceIndex = 0;
-    const statusText = document.getElementById("camera-status");
-    if (statusText) statusText.innerHTML = `Scan Face: <strong>${faceSequence[0]}</strong>`;
-    await originalOpenScanner();
-};
 window.closeCubeScanner = () => {
-
-    const modal =
-        document.getElementById("camera-modal");
-
-    modal.hidden = true;
-
-    if (stream) {
-        stream.getTracks().forEach(
-            t => t.stop()
-        );
-        stream = null;
-    }
+    document.getElementById("camera-modal").hidden = true;
 };
-
 document
     .getElementById("close-camera-btn")
     .onclick = closeCubeScanner;

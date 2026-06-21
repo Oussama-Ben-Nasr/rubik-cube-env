@@ -583,7 +583,6 @@ body.light .history-badge--solver {
     position: fixed;
     top: 120px;
     right: 340px;
-    /* left of timer panel */
     width: 54px;
     height: 54px;
 
@@ -638,7 +637,6 @@ body.light .history-badge--solver {
 #snapshot-btn {
     position: fixed;
     top: 184px;
-    /* below camera-home-btn with 10px gap */
     right: 340px;
     width: 54px;
     height: 54px;
@@ -662,13 +660,11 @@ body.light .history-badge--solver {
     box-shadow: 0 0 15px rgba(168, 139, 232, 0.3);
 }
 
-/* ── Snapshot tree panel ── */
 
 #snapshot-tree {
     position: fixed;
     top: 120px;
     right: 404px;
-    /* 340 + 54 + 10 */
     z-index: 1000;
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
@@ -772,8 +768,7 @@ body.light .history-badge--solver {
     align-items: center;
     gap: 10px;
 }
- 
-/* Snapshot disabled during compete mode */
+
 #snapshot-btn:disabled,
 #snapshot-create-btn:disabled {
     opacity: 0.3;
@@ -781,19 +776,12 @@ body.light .history-badge--solver {
     pointer-events: none;
 }
 
- 
-/* Snapshot nodes unclickable during compete mode */
 body.competing .snapshot-node {
     opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
 }
- 
-/* ==========================================================================
-   Slim vertical side panel — replaces all individual fixed positioning (v11)
-   ========================================================================== */
- 
-/* Remove old standalone positioning for these elements */
+
 #camera-home-btn {
     position: static;
     top: unset;
@@ -823,12 +811,11 @@ body.competing .snapshot-node {
     background: transparent;
     backdrop-filter: none;
 }
- 
-/* The unified panel */
+
 #floating-side-panel {
     position: fixed;
     top: 50%;
-    right: 340px;          /* left of the timer/history panel */
+    right: 340px;     
     transform: translateY(-50%);
     z-index: 1000;
  
@@ -845,17 +832,15 @@ body.competing .snapshot-node {
  
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    overflow: hidden;      /* keeps children clipped to the pill shape */
+    overflow: hidden; 
     transition: width 0.25s ease;
 }
- 
-/* When the snapshot tree is open the panel widens to show labels */
+
 #floating-side-panel.expanded {
     width: 220px;
     border-radius: 14px;
 }
- 
-/* Both icon buttons share the same style inside the panel */
+
 #floating-side-panel .side-btn {
     width: 100%;
     height: 54px;
@@ -885,16 +870,14 @@ body.competing .snapshot-node {
 #snapshot-btn {
     color: #a88be8;
 }
- 
-/* Thin divider between the two buttons */
+
 .side-panel-divider {
     height: 1px;
     background: var(--panel-border);
     margin: 0 10px;
     flex-shrink: 0;
 }
- 
-/* Snapshot tree lives inside the panel, below the buttons */
+
 #snapshot-tree {
     display: flex;
     flex-direction: column;
@@ -945,7 +928,6 @@ body.competing .snapshot-node {
     pointer-events: none;
 }
 
-/* Tooltip on hover for slim mode */
 #floating-side-panel .side-btn {
     position: relative;
 }
@@ -972,15 +954,13 @@ body.competing .snapshot-node {
 #floating-side-panel:not(.expanded) .side-btn:hover::after {
     opacity: 1;
 }
- 
-/* Color coding for action buttons */
+
 .side-btn.btn-reset  { color: #888; }
 .side-btn.btn-solve  { color: #f5c542; }
 .side-btn.btn-undo   { color: #888; }
 .side-btn.btn-redo   { color: #888; }
 .side-btn.btn-theme  { color: #aaa; }
- 
-/* Hide the old action-row in controls-panel — buttons moved to side panel */
+
 #action-row { display: none; }
 #theme-toggle { display: none; }
 #camera-modal {
@@ -1011,7 +991,6 @@ body.competing .snapshot-node {
     border: 1px solid #2d2d34;
 }
 
-/* Wrapper to hold video and canvas together precisely */
 .video-container {
     position: relative;
     width: 640px;
@@ -1079,4 +1058,103 @@ body.competing .snapshot-node {
 #close-camera-btn:hover {
     background: #3f3f46;
     color: #f4f4f5;
+}
+
+#scanner-feedback-matrix {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 90px;
+    height: 90px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+.feedback-cell {
+    background: #2d2d34;
+    border-radius: 2px;
+    transition: background-color 0.15s ease;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#scanner-feedback-matrix {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 100px;
+    height: 100px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 3px;
+    background: rgba(0, 0, 0, 0.75);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    z-index: 5010;
+}
+
+.feedback-cell {
+    background: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.feedback-cell:active {
+    transform: scale(0.9);
+}
+#manual-cube-editor-grid {
+    width: 280px;
+    height: 280px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    background: #111115;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #2d2d34;
+    margin: 0 auto;
+}
+
+.editor-cell {
+    background: #ffffff;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+    transition: transform 0.1s ease, background-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.editor-cell:hover {
+    transform: scale(1.02);
+    box-shadow: inset 0 0 15px rgba(255,255,255,0.1), 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.editor-cell:active {
+    transform: scale(0.96);
+}
+
+.editor-cell[data-idx="4"] {
+    cursor: not-allowed;
+    position: relative;
+}
+.editor-cell[data-idx="4"]::after {
+    content: "🔒";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    opacity: 0.6;
 }

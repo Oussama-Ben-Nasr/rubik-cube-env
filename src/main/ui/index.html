@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rubik's Cube</title>
-  <link rel="stylesheet" href="/static/style.css?v14">
+  <link rel="stylesheet" href="/static/style.css?v16">
 </head>
 <div id="alert-modal" class="modal-overlay">
   <div class="modal-box">
@@ -53,20 +53,32 @@
   </div>
 </div>
 <div id="camera-modal" hidden>
-  <div id="camera-panel">
-    
-    <div class="video-container">
-      <video id="camera-video" autoplay playsinline></video>
-      <canvas id="camera-overlay"></canvas>
+  <div id="camera-panel" style="width: 420px; max-width: 95vw; position: relative;">
+    <div id="scanner-error-banner" style="display: none; background: #ef4444; color: #ffffff; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 14px; text-align: center; font-weight: 500; border: 1px solid #dc2626;">
+      ⚠️ Error Message Placeholder
     </div>
 
-    <div id="camera-status">
-      Scan Face: <strong>U</strong> (Top)
+    <div id="manual-cube-editor-grid">
+      <div class="editor-cell" data-idx="0" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="1" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="2" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="3" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="4" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="5" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="6" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="7" onclick="cycleCellColor(this)"></div>
+      <div class="editor-cell" data-idx="8" onclick="cycleCellColor(this)"></div>
     </div>
+
+    <div id="camera-status" style="margin-top: 20px; font-size: 1.2rem; text-align: center;">
+      Editing Face: <strong>U (White)</strong>
+    </div>
+    
+    <div id="camera-hint" style="color: #a1a1aa; font-size: 0.9rem; text-align: center; margin-bottom: 16px;"></div>
 
     <div class="camera-controls">
-      <button id="capture-face-btn">Capture</button>
-      <button id="close-camera-btn">Close</button>
+      <button id="capture-face-btn">Confirm Face</button>
+      <button id="close-camera-btn">Cancel & Exit</button>
     </div>
 
   </div>
@@ -136,11 +148,11 @@
     <button class="side-btn btn-theme" onclick="toggleTheme()" id="theme-toggle">☀️</button>
 
     <div class="side-panel-divider"></div>
-    <button id="camera-home-btn" class="side-btn" onclick="resetCameraView()">🏠</button>
+    <button id="camera-home-btn" data-label="Reset camera view" class="side-btn" onclick="resetCameraView()">🏠</button>
     <div class="side-panel-divider"></div>
-    <button id="scan-cube-btn" class="side-btn">📷</button>
+    <button id="scan-cube-btn" data-label="Upload Cube" class="side-btn">📷</button>
     <div class="side-panel-divider"></div>
-    <button id="snapshot-btn" class="side-btn">💾</button>
+    <button id="snapshot-btn" data-label="Snapshots" class="side-btn">💾</button>
     <div id="snapshot-tree" hidden>
       <button id="snapshot-create-btn" onclick="createSnapshot()">+ save snapshot</button>
     </div>
@@ -153,7 +165,7 @@
   }
 }
 </script>
-  <script type="module" src="/static/cube.js?v14"></script>
+  <script type="module" src="/static/cube.js?v16"></script>
 </body>
 
 </html>
