@@ -145,7 +145,7 @@ class TestKnownSequences:
     def test_known_move_six_times_is_identity(self):
         """R U R' U' repeated 6 times returns to solved (well-known identity)."""
         cube = RubikCube3D()
-        known = [10, 0, 11, 1]  # R U R' U'
+        known = [10, 0, 11, 1]
         for _ in range(6):
             for action in known:
                 cube.apply_action(action)

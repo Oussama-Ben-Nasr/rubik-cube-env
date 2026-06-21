@@ -1,15 +1,15 @@
 import * as THREE from "three";
 import { TrackballControls } from "https://unpkg.com/three@0.179.1/examples/jsm/controls/TrackballControls.js";
-import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v13';
+import { initMoveHistory, syncHistoryDisplay, initSolver } from '/static/solver.js?v16';
 
 const SIDEBAR_W = 220;
 const INDEX_COLORS = [
-    0xffffff, // 0  U  white
-    0x00cc44, // 1  F  green
-    0xffdd00, // 2  D  yellow
-    0xff8800, // 3  L  orange
-    0x1144ff, // 4  B  blue
-    0xee1111, // 5  R  red
+    0xffffff, // 0  U  white  
+    0x00cc44, // 1  F  green  
+    0xffdd00, // 2  D  yellow 
+    0xff8800, // 3  L  orange 
+    0x1144ff, // 4  B  blue   
+    0xee1111, // 5  R  red    
 ];
 
 const DARK_BG = 0x0d1117;
@@ -24,9 +24,6 @@ const ANIM_DURATION_MS = 280;
 const loadingOverlay =
     document.getElementById("loading-overlay");
 
-// Action → { axis, layerValue, direction, angleDelta }
-// axis: 0=X,1=Y,2=Z   layerValue: which slice (-1|0|1)
-// angleDelta: full rotation in radians (±π/2)
 const ACTION_META = [
     { axis: 1, layer: 1, angle: Math.PI / 2 },  //  0  U
     { axis: 1, layer: 1, angle: -Math.PI / 2 },  //  1  U'
@@ -84,7 +81,7 @@ window.setCompeting = (val) => {
     if (createBtn)   { createBtn.disabled   = val; }
  
     // Action buttons — solve/undo/redo locked during compete; reset always allowed
-    ["solve-btn", "btn-undo", "btn-redo"].forEach(id => {
+    ["scan-cube-btn", "solve-btn", "btn-undo", "btn-redo"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = val;
     });
@@ -755,10 +752,6 @@ window.shareTo = (platform) => {
     document.getElementById("share-menu").hidden = true;
 };
 
-// ---------------------------------------------------------------------------
-// Keyboard shortcuts
-// U/D/F/B/L/R = normal move, Shift+key = prime (inverse)
-// ---------------------------------------------------------------------------
 const KEY_TO_MOVE = {
     'u': 0, 'U': 1,
     'd': 2, 'D': 3,
@@ -774,8 +767,8 @@ document.addEventListener('keydown', (e) => {
     if (document.getElementById('solve-btn').disabled) return;
 
     const key = e.shiftKey
-        ? e.key.toUpperCase()   // Shift+U → 'U' → prime
-        : e.key.toLowerCase();  // u → normal
+        ? e.key.toUpperCase() 
+        : e.key.toLowerCase();
 
     const moveId = KEY_TO_MOVE[key];
     if (moveId === undefined) return;
@@ -908,3 +901,158 @@ function initSnapshotUI() {
 function _fmtTime(date) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
+let currentFaceIndex = 0;
+const faceSequence = ["U", "F", "R", "D", "B", "L"];
+const faceDataMap = {};
+
+const colorTokens = ["W", "G", "R", "Y", "B", "O"];
+const colorHexMap = {
+    "W": "#ffffff", "G": "#00ff55", "R": "#ff2a2a",
+    "Y": "#ffdd00", "B": "#0066ff", "O": "#ff8800"
+};
+const faceMeta = {
+    "U": { 
+        name: "White", 
+        primary: "W", 
+        hiddenNotes: "Keep GREEN facing front. Look at the TOP face." 
+    },
+    "F": { 
+        name: "Green", 
+        primary: "G", 
+        hiddenNotes: "Keep WHITE on top. Look at the FRONT face." 
+    },
+    "R": { 
+        name: "Red", 
+        primary: "R",   
+        hiddenNotes: "Keep WHITE on top. Look at the RIGHT face (turn cube left)." 
+    },
+    "D": { 
+        name: "Yellow", 
+        primary: "Y", 
+        hiddenNotes: "Keep GREEN facing front. Look at the BOTTOM face." 
+    },
+    "B": { 
+        name: "Blue", 
+        primary: "B",   
+        hiddenNotes: "Keep WHITE on top. Look at the BACK face (turn cube around)." 
+    },
+    "L": { 
+        name: "Orange", 
+        primary: "O", 
+        hiddenNotes: "Keep WHITE on top. Look at the LEFT face (turn cube right)." 
+    }
+};
+
+let activeFaceBuffer = Array(9).fill("W");
+
+window.openCubeScanner = () => {
+    const modal = document.getElementById("camera-modal");
+    const banner = document.getElementById("scanner-error-banner");
+    if (banner) banner.style.display = "none"; // Clear stale errors
+    
+    currentFaceIndex = 0;
+    modal.hidden = false;
+    initFaceBuffer();
+};
+
+function initFaceBuffer() {
+    const targetFace = faceSequence[currentFaceIndex];
+    const meta = faceMeta[targetFace];
+
+    if (faceDataMap[targetFace]) {
+        activeFaceBuffer = [...faceDataMap[targetFace]];
+    } else {
+        activeFaceBuffer = Array(9).fill(meta.primary);
+    }
+
+    const statusText = document.getElementById("camera-status");
+    const hintText = document.getElementById("camera-hint");
+
+    statusText.innerHTML = `Editing Face: <span style="color: ${colorHexMap[meta.primary]}; font-weight: bold;">${targetFace} (${meta.name})</span>`;
+
+    hintText.innerHTML = `
+        <div style="margin-bottom: 8px; color: #e4e4e7; font-weight: 500;">Click cells to cycle colors. Center is locked.</div>
+        <div style="font-size: 0.85rem; color: #f43f5e; background: rgba(244, 63, 94, 0.08); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.2); text-align: left; line-height: 1.4;">
+            ⚠️ <strong>Mandatory Holding Position:</strong><br>
+            ${meta.hiddenNotes}
+        </div>
+    `;
+
+    renderEditorGrid();
+}
+
+function renderEditorGrid() {
+    const cells = document.querySelectorAll(".editor-cell");
+    cells.forEach((cell, idx) => {
+        const token = activeFaceBuffer[idx];
+        cell.style.backgroundColor = colorHexMap[token];
+    });
+}
+
+window.cycleCellColor = (element) => {
+    const idx = parseInt(element.getAttribute("data-idx"), 10);
+    if (idx === 4) return;
+
+    const currentToken = activeFaceBuffer[idx];
+    let nextIdx = (colorTokens.indexOf(currentToken) + 1) % colorTokens.length;
+    activeFaceBuffer[idx] = colorTokens[nextIdx];
+    
+    element.style.backgroundColor = colorHexMap[activeFaceBuffer[idx]];
+};
+
+async function captureCurrentView() {
+    const statusText = document.getElementById("camera-status");
+    const banner = document.getElementById("scanner-error-banner");
+    const activeFace = faceSequence[currentFaceIndex];
+
+    faceDataMap[activeFace] = [...activeFaceBuffer];
+    currentFaceIndex++;
+
+    if (currentFaceIndex < faceSequence.length) {
+        initFaceBuffer();
+    } else {
+        statusText.innerHTML = `<span style="color: #ffdd00;">Checking data metrics consistency...</span>`;
+        if (banner) banner.style.display = "none";
+
+        try {
+            const response = await fetch("/cube/load_facelets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ faces: faceDataMap })
+            });
+            const result = await response.json();
+            
+            if (result.status === "ok") {
+                statusText.innerHTML = "<span style=\"color: #00ff88; font-weight: bold;\">🎉 State Loaded Successfully!</span>";
+                setTimeout(() => { document.getElementById("camera-modal").hidden = true; }, 1200);
+                const state = await fetch("/cube").then(r => r.json());
+                renderCube(state);
+            } else {
+                if (banner) {
+                    banner.innerText = `⚠️ Scan Rejected: ${result.reason}`;
+                    banner.style.display = "block";
+                }
+            }
+            currentFaceIndex = 0;
+            initFaceBuffer();
+        } catch (err) {
+            statusText.innerHTML = `<span style="color: #ff2a2a;">Network pipeline connection error.</span>`;
+            currentFaceIndex = 0;
+            initFaceBuffer();
+        }
+    }
+}
+window.closeCubeScanner = () => {
+    document.getElementById("camera-modal").hidden = true;
+};
+document
+    .getElementById("close-camera-btn")
+    .onclick = closeCubeScanner;
+
+document
+.getElementById("capture-face-btn")
+.onclick = captureCurrentView;
+
+document
+    .getElementById("scan-cube-btn")
+    .onclick = openCubeScanner;
