@@ -81,7 +81,7 @@ window.setCompeting = (val) => {
     if (createBtn)   { createBtn.disabled   = val; }
  
     // Action buttons — solve/undo/redo locked during compete; reset always allowed
-    ["solve-btn", "btn-undo", "btn-redo"].forEach(id => {
+    ["scan-cube-btn", "solve-btn", "btn-undo", "btn-redo"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = val;
     });
