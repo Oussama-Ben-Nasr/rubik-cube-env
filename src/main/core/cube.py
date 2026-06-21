@@ -252,5 +252,8 @@ class RubikCube3D:
             for entry in state
         ]
 
+    def load_facelets(self, faces):
+        return faces
+
     def is_competing(self):
         return self._competing and self._start_solve != None

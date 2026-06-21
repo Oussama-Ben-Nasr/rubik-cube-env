@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rubik's Cube</title>
-  <link rel="stylesheet" href="/static/style.css?v13">
+  <link rel="stylesheet" href="/static/style.css?v14">
 </head>
 <div id="alert-modal" class="modal-overlay">
   <div class="modal-box">
@@ -52,7 +52,25 @@
     </div>
   </div>
 </div>
+<div id="camera-modal" hidden>
+  <div id="camera-panel">
+    
+    <div class="video-container">
+      <video id="camera-video" autoplay playsinline></video>
+      <canvas id="camera-overlay"></canvas>
+    </div>
 
+    <div id="camera-status">
+      Scan Face: <strong>U</strong> (Top)
+    </div>
+
+    <div class="camera-controls">
+      <button id="capture-face-btn">Capture</button>
+      <button id="close-camera-btn">Close</button>
+    </div>
+
+  </div>
+</div>
 <body>
   <div id="stats-panel">
 
@@ -72,10 +90,6 @@
   <div id="controls-panel">
 
     <div class="panel-label">cube control
-      <!-- <button id="theme-toggle" onclick="toggleTheme()"
-        style="float:right; width:auto; padding:2px 8px; font-size:10px;">
-        ☀ light
-      </button> -->
     </div>
     <div id="moves-grid">
       <div class="btn-pair"><span class="face-label">U</span><button onclick="doMove(0)">U</button><button
@@ -91,15 +105,6 @@
       <div class="btn-pair"><span class="face-label">R</span><button onclick="doMove(10)">R</button><button
           onclick="doMove(11)" class="prime">R'</button></div>
     </div>
-
-    <!-- <hr class="divider">
-
-    <div id="action-row">
-      <button id="btn-reset" onclick="setCompeting(false); doReset()">↺ reset</button>
-      <button id="solve-btn">✨ Solve</button>
-      <button id="btn-undo" onclick="doUndo()">↩ undo</button>
-      <button id="btn-redo" onclick="doRedo()">↪ redo</button>
-    </div> -->
   </div>
   <div id="history-panel">
 
@@ -122,27 +127,24 @@
     <button id="btn-scramble" onclick="setCompeting(true); doScramble()">⚡ compete</button>
 
   </div>
-   <!-- Slim vertical side panel: actions + camera + snapshot -->
   <div id="floating-side-panel">
- 
-    <!-- Cube actions -->
+
     <button class="side-btn btn-reset" onclick="setCompeting(false); doReset()">⟲</button>
     <button class="side-btn btn-solve" id="solve-btn">✨</button>
-    <button class="side-btn btn-undo"  onclick="doUndo()">⮌</button>
-    <button class="side-btn btn-redo"  onclick="doRedo()">⮎</button>
+    <button class="side-btn btn-undo" onclick="doUndo()">⮌</button>
+    <button class="side-btn btn-redo" onclick="doRedo()">⮎</button>
     <button class="side-btn btn-theme" onclick="toggleTheme()" id="theme-toggle">☀️</button>
- 
+
     <div class="side-panel-divider"></div>
- 
-    <!-- Camera + snapshot -->
-    <button id="camera-home-btn" class="side-btn" data-label="Reset camera" onclick="resetCameraView()">🏠</button>
+    <button id="camera-home-btn" class="side-btn" onclick="resetCameraView()">🏠</button>
     <div class="side-panel-divider"></div>
-    <button id="snapshot-btn" class="side-btn" data-label="Snapshots">📷</button>
+    <button id="scan-cube-btn" class="side-btn">📷</button>
+    <div class="side-panel-divider"></div>
+    <button id="snapshot-btn" class="side-btn">💾</button>
     <div id="snapshot-tree" hidden>
       <button id="snapshot-create-btn" onclick="createSnapshot()">+ save snapshot</button>
-      <!-- .snapshot-list injected here by renderSnapshotTree() -->
     </div>
- 
+
   </div>
   <script type="importmap">
 {
@@ -151,7 +153,7 @@
   }
 }
 </script>
-  <script type="module" src="/static/cube.js?v13"></script>
+  <script type="module" src="/static/cube.js?v14"></script>
 </body>
 
 </html>

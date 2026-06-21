@@ -908,3 +908,169 @@ function initSnapshotUI() {
 function _fmtTime(date) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
+let stream = null;
+const captures = [];
+
+window.openCubeScanner = async () => {
+    const modal = document.getElementById("camera-modal");
+    const video = document.getElementById("camera-video");
+
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment",
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        });
+        
+        video.srcObject = stream;
+        modal.hidden = false;
+
+        video.onloadedmetadata = () => {
+            // Wait for elements to layout completely before sizing canvas
+            requestAnimationFrame(drawScannerGrid);
+        };
+    } catch (err) {
+        console.error("Camera access blocked or unavailable:", err);
+    }
+};
+
+function drawScannerGrid() {
+    const canvas = document.getElementById("camera-overlay");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    
+    // Set actual render resolution matching layout bounds
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    // Adjust grid dimension relative to layout size (e.g., 50% of minimum width/height)
+    const size = Math.min(canvas.width, canvas.height) * 0.55;
+    const startX = (canvas.width - size) / 2;
+    const startY = (canvas.height - size) / 2;
+    const cell = size / 3;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grid boxes styling
+    ctx.strokeStyle = "#00ff88";
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = "#00ff88";
+
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            ctx.strokeRect(
+                startX + c * cell,
+                startY + r * cell,
+                cell,
+                cell
+            );
+        }
+    }
+}
+
+// Recalculate grid dynamically if layout scales up/down
+window.addEventListener("resize", () => {
+    const modal = document.getElementById("camera-modal");
+    if (modal && !modal.hidden) {
+        drawScannerGrid();
+    }
+});
+const faceSequence = ["U", "F", "R", "D", "B", "L"]; // Order of cube faces to capture
+let currentFaceIndex = 0;
+const faceDataMap = {}; // Holds captured color arrays or images
+async function captureCurrentView() {
+    const video = document.getElementById("camera-video");
+    const statusText = document.getElementById("camera-status");
+    
+    if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+        console.warn("Video stream not ready yet.");
+        return;
+    }
+
+    // 1. Capture snapshot to offscreen canvas
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    // 2. Visual feedback flash effect
+    video.style.opacity = "0.3";
+    setTimeout(() => video.style.opacity = "1", 150);
+
+    const activeFace = faceSequence[currentFaceIndex];
+    
+    // [Placeholder for your HSV / Face Mapping Task]
+    // For now, let's populate dummy facelet color strings (e.g. 'w','w','w'...) 
+    // until your HSV classification logic extracts colors from the 3x3 zones
+    faceDataMap[activeFace] = Array(9).fill("w"); 
+    
+    console.log(`Captured face ${activeFace}:`, canvas);
+
+    // 3. Move to the next face configuration
+    currentFaceIndex++;
+
+    if (currentFaceIndex < faceSequence.length) {
+        const nextFace = faceSequence[currentFaceIndex];
+        statusText.innerHTML = `Scan Face: <strong>${nextFace}</strong>`;
+    } else {
+        // All faces captured! Send payload to your backend '/cube/load_facelets'
+        statusText.innerText = "Processing Cube Matrix...";
+        
+        try {
+            const response = await fetch("/cube/load_facelets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ faces: faceDataMap })
+            });
+            const result = await response.json();
+            
+            if (result.status === "ok") {
+                statusText.innerText = "Cube Scanned Successfully!";
+                setTimeout(closeCubeScanner, 1200);
+            }
+        } catch (err) {
+            statusText.innerText = "Error syncing payload to server.";
+            console.error(err);
+        }
+    }
+}
+
+// Reset tracker index whenever scanner is reopened
+const originalOpenScanner = window.openCubeScanner;
+window.openCubeScanner = async () => {
+    currentFaceIndex = 0;
+    const statusText = document.getElementById("camera-status");
+    if (statusText) statusText.innerHTML = `Scan Face: <strong>${faceSequence[0]}</strong>`;
+    await originalOpenScanner();
+};
+window.closeCubeScanner = () => {
+
+    const modal =
+        document.getElementById("camera-modal");
+
+    modal.hidden = true;
+
+    if (stream) {
+        stream.getTracks().forEach(
+            t => t.stop()
+        );
+        stream = null;
+    }
+};
+
+document
+    .getElementById("close-camera-btn")
+    .onclick = closeCubeScanner;
+
+document
+.getElementById("capture-face-btn")
+.onclick = captureCurrentView;
+
+document
+    .getElementById("scan-cube-btn")
+    .onclick = openCubeScanner;

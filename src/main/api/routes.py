@@ -328,3 +328,17 @@ def list_snapshots(request: Request, response: Response):
     """Return all snapshot ids for this session."""
     store = get_snapshots(request, response)
     return {"snapshot_ids": list(store.keys())}
+
+@app.post("/cube/load_facelets")
+def load_facelets(body: dict,
+                  request: Request,
+                  response: Response):
+
+    cube = get_cube(request, response)
+
+    res=cube.load_facelets(
+        body["faces"]
+    )
+    logger.info(res)
+
+    return {"status":"ok"}
